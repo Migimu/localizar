@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -36,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   CameraPosition _initialPosition =
       CameraPosition(target: LatLng(26.8206, 30.8025), zoom: 6);
   Completer<GoogleMapController> _controller = Completer();
+  Set<Marker> _markers = HashSet<Marker>();
 
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
@@ -67,8 +69,10 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     if (await Permission.location.request().isGranted) {
       print("@@@@@@@@@@@@@@@@@@@object################");
+
       _goToTheUser();
     }
+
     // You can request multiple permissions at once.
   }
 
@@ -83,11 +87,14 @@ class _MyHomePageState extends State<MyHomePage> {
     print(await _getCurrentLocation());
     _currentPosition = await _getCurrentLocation();
     print(_currentPosition);
-    /*print(_currentPosition.longitude);
-    print(_currentPosition.latitude);*/
 
     LatLng latLngPosition =
         LatLng(_currentPosition.latitude, _currentPosition.longitude);
+
+    setState(() {
+      _markers.clear();
+      _markers.add(Marker(markerId: MarkerId("1"), position: latLngPosition));
+    });
 
     CameraPosition cameraPosition =
         new CameraPosition(target: latLngPosition, zoom: 14);
@@ -106,6 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
           GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: _initialPosition,
+            markers: _markers,
           ),
         ],
       ),
