@@ -100,6 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
         new CameraPosition(target: latLngPosition, zoom: 14);
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    _goToTheUser();
   }
 
   @override
