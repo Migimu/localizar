@@ -1,9 +1,8 @@
-import 'dart:async';
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
+
+import 'package:geo_explorer/map.dart';
+import 'package:geo_explorer/chat.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() {
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
@@ -34,17 +33,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  CameraPosition _initialPosition =
-      CameraPosition(target: LatLng(26.8206, 30.8025), zoom: 6);
-  Completer<GoogleMapController> _controller = Completer();
-  Set<Marker> _markers = HashSet<Marker>();
-
-  void _onMapCreated(GoogleMapController controller) {
-    _controller.complete(controller);
-  }
-
-  Position _currentPosition;
-
+  var _currentLocation;
   @override
   void initState() {
     super.initState();
@@ -52,7 +41,32 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
-  void main(List<String> args) {}
+  Widget build(BuildContext context) {
+    return PageView(
+      children: <Widget>[
+        Scaffold(
+          body: Stack(
+            children: <Widget>[
+              map(
+                posicion: _currentLocation,
+              )
+            ],
+          ),
+        ),
+        Chat(),
+        Container(
+          color: Colors.deepPurple,
+        ),
+      ],
+    );
+  }
+
+  Future<Position> _getCurrentLocation() async {
+    return Future.delayed(Duration(seconds: 3), () {
+      return Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.bestForNavigation);
+    });
+  }
 
   _getLocationPermission() async {
     var status = await Permission.location.status;
@@ -68,56 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // The OS restricts access, for example because of parental controls.
     }
     if (await Permission.location.request().isGranted) {
-      print("@@@@@@@@@@@@@@@@@@@object################");
-
-      _goToTheUser();
+      _currentLocation = _getCurrentLocation();
     }
-
-    // You can request multiple permissions at once.
-  }
-
-  Future<Position> _getCurrentLocation() async {
-    return Future.delayed(Duration(seconds: 3), () {
-      return Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best);
-    });
-  }
-
-  Future<void> _goToTheUser() async {
-    print(await _getCurrentLocation());
-    _currentPosition = await _getCurrentLocation();
-    print(_currentPosition);
-
-    LatLng latLngPosition =
-        LatLng(_currentPosition.latitude, _currentPosition.longitude);
-
-    setState(() {
-      _markers.clear();
-      _markers.add(Marker(markerId: MarkerId("1"), position: latLngPosition));
-    });
-
-    CameraPosition cameraPosition =
-        new CameraPosition(target: latLngPosition, zoom: 14);
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-    _goToTheUser();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Stack(
-        children: <Widget>[
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: _initialPosition,
-            markers: _markers,
-          ),
-        ],
-      ),
-    );
   }
 }

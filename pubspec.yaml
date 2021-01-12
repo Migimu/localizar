@@ -26,6 +26,7 @@ dependencies:
   google_maps_flutter: ^1.0.6
   geolocator: ^6.1.13
   permission_handler: ^5.0.1+1
+  dash_chat: ^1.1.15
 
 
   # The following adds the Cupertino Icons font to your application.
