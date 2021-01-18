@@ -4,7 +4,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
+//import 'package:permission_handler/permission_handler.dart';
 
 class map extends StatefulWidget {
   final LatLng posicion;
@@ -23,8 +23,8 @@ class _mapState extends State<map> {
     this.posicion = posicion;
   }
 
-  CameraPosition _initialPosition =
-      CameraPosition(target: LatLng(26.8206, 30.8025), zoom: 15);
+  CameraPosition _initialPosition = CameraPosition(
+      target: LatLng(43.3141039075075, -1.883062156365791), zoom: 11);
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = HashSet<Marker>();
 
@@ -40,8 +40,8 @@ class _mapState extends State<map> {
     _goToTheUser();
   }
 
-  @override
-  void main(List<String> args) {}
+  /*@override
+  void main(List<String> args) {}*/
 
   Future<Position> _getCurrentLocation() async {
     return Future(() {
@@ -70,7 +70,7 @@ class _mapState extends State<map> {
     //_moveMarker();
   }
 
-  Future<void> _moveMarker() async {
+  /*Future<void> _moveMarker() async {
     print(await _getCurrentLocation());
     _currentPosition = await _getCurrentLocation();
     print(_currentPosition);
@@ -86,7 +86,7 @@ class _mapState extends State<map> {
           consumeTapEvents: false));
     });
     _moveMarker();
-  }
+  }*/
 
   void _changeMapType() {
     setState(() {
@@ -124,6 +124,33 @@ class _mapState extends State<map> {
                     print('Changing the Map Type');
                   }),
             ]),
+          ),
+          Container(
+            child: GoogleMap(
+              myLocationEnabled: true,
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: _initialPosition,
+              markers: _markers,
+              mapToolbarEnabled: false,
+              mapType: _defaultMapType,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 80, right: 10),
+            alignment: Alignment.topRight,
+            child: Column(children: <Widget>[
+              FloatingActionButton(
+                  child: Icon(Icons.layers),
+                  elevation: 5,
+                  backgroundColor: Colors.teal[200],
+                  onPressed: () {
+                    _changeMapType();
+                    print('Changing the Map Type');
+                  }),
+            ]),
+          ),
+          Container(
+            child: Text(""),
           )
         ],
       ),
