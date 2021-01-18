@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -44,25 +45,19 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return PageView(
       children: <Widget>[
-        Scaffold(
-          body: Stack(
-            children: <Widget>[
-              map(
-                posicion: _currentLocation,
-              )
-            ],
-          ),
-        ),
-        Chat(),
         Container(
           color: Colors.deepPurple,
         ),
+        map(
+          posicion: _currentLocation,
+        ),
+        Chat(),
       ],
     );
   }
 
   Future<Position> _getCurrentLocation() async {
-    return Future.delayed(Duration(seconds: 3), () {
+    return Future(() {
       return Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.bestForNavigation);
     });

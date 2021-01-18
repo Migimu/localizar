@@ -16,13 +16,15 @@ class map extends StatefulWidget {
 }
 
 class _mapState extends State<map> {
-  LatLng posicion = LatLng(26.8206, 30.8025);
+  var posicion = LatLng(26.8206, 30.8025);
+  MapType _defaultMapType = MapType.normal;
 
   _mapState(LatLng posicion) {
     this.posicion = posicion;
   }
 
-  CameraPosition _initialPosition = CameraPosition(target: posicion, zoom: 6);
+  CameraPosition _initialPosition =
+      CameraPosition(target: LatLng(26.8206, 30.8025), zoom: 15);
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = HashSet<Marker>();
 
@@ -42,7 +44,7 @@ class _mapState extends State<map> {
   void main(List<String> args) {}
 
   Future<Position> _getCurrentLocation() async {
-    return Future.delayed(Duration(seconds: 3), () {
+    return Future(() {
       return Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.bestForNavigation);
     });
@@ -56,16 +58,16 @@ class _mapState extends State<map> {
     LatLng latLngPosition =
         LatLng(_currentPosition.latitude, _currentPosition.longitude);
 
-    setState(() {
+    /*setState(() {
       _markers.clear();
       _markers.add(Marker(markerId: MarkerId("1"), position: latLngPosition));
-    });
+    });*/
 
     CameraPosition cameraPosition =
         new CameraPosition(target: latLngPosition, zoom: 14);
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-    _moveMarker();
+    //_moveMarker();
   }
 
   Future<void> _moveMarker() async {
@@ -86,14 +88,44 @@ class _mapState extends State<map> {
     _moveMarker();
   }
 
+  void _changeMapType() {
+    setState(() {
+      _defaultMapType = _defaultMapType == MapType.normal
+          ? MapType.satellite
+          : MapType.normal;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: _initialPosition,
-        markers: _markers,
-        mapToolbarEnabled: false,
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          Container(
+            child: GoogleMap(
+              myLocationEnabled: true,
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: _initialPosition,
+              markers: _markers,
+              mapToolbarEnabled: false,
+              mapType: _defaultMapType,
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 80, right: 10),
+            alignment: Alignment.topRight,
+            child: Column(children: <Widget>[
+              FloatingActionButton(
+                  child: Icon(Icons.layers),
+                  elevation: 5,
+                  backgroundColor: Colors.teal[200],
+                  onPressed: () {
+                    _changeMapType();
+                    print('Changing the Map Type');
+                  }),
+            ]),
+          )
+        ],
       ),
     );
   }
