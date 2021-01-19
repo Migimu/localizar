@@ -27,6 +27,7 @@ class _mapState extends State<map> {
       target: LatLng(43.3141039075075, -1.883062156365791), zoom: 11);
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = HashSet<Marker>();
+  Set<Circle> _circles = HashSet<Circle>();
 
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
@@ -37,6 +38,7 @@ class _mapState extends State<map> {
   @override
   void initState() {
     super.initState();
+    _setMarkers();
     _goToTheUser();
   }
 
@@ -96,6 +98,23 @@ class _mapState extends State<map> {
     });
   }
 
+  void _setMarkers() {
+    setState(() {
+      _circles.add(Circle(
+        circleId: CircleId("1"),
+        center: LatLng(43.3141039075075, -1.883062156365791),
+        radius: 500,
+      ));
+    });
+
+    setState(() {
+      _markers.add(Marker(
+          markerId: MarkerId("1"),
+          position: LatLng(43.3141039075075, -1.883062156365791),
+          consumeTapEvents: false));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,6 +126,7 @@ class _mapState extends State<map> {
               onMapCreated: _onMapCreated,
               initialCameraPosition: _initialPosition,
               markers: _markers,
+              circles: _circles,
               mapToolbarEnabled: false,
               mapType: _defaultMapType,
             ),
@@ -125,33 +145,12 @@ class _mapState extends State<map> {
                   }),
             ]),
           ),
-          Container(
-            child: GoogleMap(
-              myLocationEnabled: true,
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: _initialPosition,
-              markers: _markers,
-              mapToolbarEnabled: false,
-              mapType: _defaultMapType,
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: 80, right: 10),
-            alignment: Alignment.topRight,
-            child: Column(children: <Widget>[
-              FloatingActionButton(
-                  child: Icon(Icons.layers),
-                  elevation: 5,
-                  backgroundColor: Colors.teal[200],
-                  onPressed: () {
-                    _changeMapType();
-                    print('Changing the Map Type');
-                  }),
-            ]),
-          ),
-          Container(
-            child: Text(""),
-          )
+          /*Container(
+            child: Text("Lo has logrado"),
+            height: 100,
+            width: 200,
+            color: Colors.amber,
+          )*/
         ],
       ),
     );
