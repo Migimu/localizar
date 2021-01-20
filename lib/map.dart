@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:geo_explorer/dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 //import 'package:permission_handler/permission_handler.dart';
@@ -18,6 +20,8 @@ class map extends StatefulWidget {
 class _mapState extends State<map> {
   var posicion = LatLng(26.8206, 30.8025);
   MapType _defaultMapType = MapType.normal;
+  bool _isVisible = false;
+  BitmapDescriptor pinLocationIcon;
 
   _mapState(LatLng posicion) {
     this.posicion = posicion;
@@ -38,12 +42,17 @@ class _mapState extends State<map> {
   @override
   void initState() {
     super.initState();
-    _setMarkers();
+    _setCircles();
     _goToTheUser();
+    _distanceFromCircle();
   }
 
   /*@override
   void main(List<String> args) {}*/
+  void setCustomMapPin() async {
+    pinLocationIcon = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(devicePixelRatio: 2.5), 'images/pregunta.png');
+  }
 
   Future<Position> _getCurrentLocation() async {
     return Future(() {
@@ -72,23 +81,45 @@ class _mapState extends State<map> {
     //_moveMarker();
   }
 
-  /*Future<void> _moveMarker() async {
-    print(await _getCurrentLocation());
+  Future<void> _distanceFromCircle() async {
     _currentPosition = await _getCurrentLocation();
     print(_currentPosition);
 
-    LatLng latLngPosition =
-        LatLng(_currentPosition.latitude, _currentPosition.longitude);
+    var cont = 0;
 
-    setState(() {
-      _markers.clear();
-      _markers.add(Marker(
-          markerId: MarkerId("1"),
-          position: latLngPosition,
-          consumeTapEvents: false));
-    });
-    _moveMarker();
-  }*/
+    for (var circulo in Set.from(_circles)) {
+      var distancia = Geolocator.distanceBetween(
+          _currentPosition.latitude,
+          _currentPosition.longitude,
+          circulo.center.latitude,
+          circulo.center.longitude);
+      if (distancia < 200) {
+        setState(() {
+          _isVisible = true;
+          _markers.add(Marker(
+              markerId: MarkerId("$cont"),
+              position: circulo.center,
+              consumeTapEvents: false,
+              icon: pinLocationIcon,
+              onTap: () {
+                showDialog(
+                    child: Dialog(
+                      child: Pregunta(),
+                    ),
+                    context: context);
+              }));
+        });
+        cont++;
+        break;
+      } else {
+        setState(() {
+          _isVisible = false;
+        });
+      }
+    }
+
+    _distanceFromCircle();
+  }
 
   void _changeMapType() {
     setState(() {
@@ -98,26 +129,40 @@ class _mapState extends State<map> {
     });
   }
 
-  void _setMarkers() {
+  void _setCircles() {
     setState(() {
       _circles.add(Circle(
-        circleId: CircleId("1"),
-        center: LatLng(43.3141039075075, -1.883062156365791),
-        radius: 500,
+          circleId: CircleId("1"),
+          center: LatLng(43.3141039075075, -1.883062156365791),
+          radius: 200,
+          visible: false));
+      _circles.add(Circle(
+        circleId: CircleId("2"),
+        center: LatLng(43.3141039075075, -1.873062156365791),
+        radius: 200,
       ));
-    });
-
-    setState(() {
-      _markers.add(Marker(
-          markerId: MarkerId("1"),
-          position: LatLng(43.3141039075075, -1.883062156365791),
-          consumeTapEvents: false));
+      _circles.add(Circle(
+        circleId: CircleId("3"),
+        center: LatLng(43.3141039075075, -1.863062156365791),
+        radius: 200,
+      ));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          Icon(
+            Icons.perm_identity,
+          ),
+          SizedBox(
+            width: 20,
+          )
+        ],
+        title: Text("NOMBRE DE RUTA"),
+      ),
       body: Stack(
         children: <Widget>[
           Container(
@@ -131,6 +176,10 @@ class _mapState extends State<map> {
               mapType: _defaultMapType,
             ),
           ),
+
+          /*PODER DESPLAZAR CON DOS DEDOS*/
+
+          //MultiDragGestureRecognizer(debugOwner: null),
           Container(
             margin: EdgeInsets.only(top: 80, right: 10),
             alignment: Alignment.topRight,
@@ -145,12 +194,22 @@ class _mapState extends State<map> {
                   }),
             ]),
           ),
-          /*Container(
-            child: Text("Lo has logrado"),
-            height: 100,
-            width: 200,
-            color: Colors.amber,
-          )*/
+          Visibility(
+              visible: _isVisible,
+              child:
+                  Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Container(
+                    child: Center(child: Text("Lo has logrado!")),
+                    height: 100,
+                    width: 200,
+                    color: Colors.amber,
+                  )
+                ]),
+                SizedBox(
+                  height: 20,
+                )
+              ]))
         ],
       ),
     );
