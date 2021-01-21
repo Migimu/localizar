@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_explorer/swiper.dart';
+import 'package:geo_explorer/widget/swiper.dart';
 import 'package:geo_explorer/widget/loginCorrect.dart';
 import 'package:geo_explorer/widget/registerScreen.dart';
 import 'package:geo_explorer/api/conexionApi.dart';

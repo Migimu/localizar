@@ -7,7 +7,7 @@ const baseUrl =
 
 class API {
   static Future getRutas() async {
-    var url = baseUrl + "/localizaciones/todas";
+    var url = baseUrl + "/rutas/leer";
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var responseJson = json.decode(response.body);

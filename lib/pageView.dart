@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:geo_explorer/map.dart';
-import 'package:geo_explorer/chat.dart';
+import 'package:geo_explorer/widget/map.dart';
+import 'package:geo_explorer/widget/chat.dart';
 
 class Pages extends StatefulWidget {
   Pages({Key key, this.title}) : super(key: key);

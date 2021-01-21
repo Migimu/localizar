@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:geo_explorer/models/localizacion.dart';
+import 'package:geo_explorer/models/ruta.dart';
 import 'package:geo_explorer/pageView.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
 
@@ -11,13 +13,36 @@ class SwiperRutas extends StatefulWidget {
 }
 
 class _SwiperRutasState extends State<SwiperRutas> {
-  var lista;
+  List<Ruta> listaRutas = [];
 
   @override
   void initState() {
     super.initState();
-    API.getUsers().then((response) {
-      lista = response;
+    API.getRutas().then((response) {
+      Ruta ruta = new Ruta("", "", "", "", 0, "", "", "", 0, []);
+      for (var json in response) {
+        print(json["id"]);
+
+        ruta.setId(json["id"]);
+
+        ruta.setNombre(json["nombre"]);
+
+        ruta.setCiudad(json["ciudad"]);
+
+        ruta.setTamatica(json["tematica"]);
+
+        ruta.setDuracion(json["duracion"]);
+
+        ruta.setDescripcion(json["descripcion"]);
+
+        ruta.setTransporte(json["transporte"]);
+
+        ruta.setImagen(json["imagen"]);
+
+        ruta.setDificultad(json["dificultad"]);
+
+        listaRutas.add(ruta);
+      }
     });
   }
 
@@ -61,7 +86,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
         ),
         Swiper(
           layout: SwiperLayout.TINDER,
-          itemCount: imageList.length,
+          itemCount: listaRutas.length,
           itemBuilder: (context, index) {
             return Container(
               child: Column(children: <Widget>[
@@ -81,10 +106,11 @@ class _SwiperRutasState extends State<SwiperRutas> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     SizedBox(),
-                    Text("TITULO $index",
-                        style: DefaultTextStyle.of(context)
-                            .style
-                            .apply(fontSizeFactor: 2.0)),
+                    Flexible(
+                        child: Text(listaRutas[index].getNombre(),
+                            style: DefaultTextStyle.of(context)
+                                .style
+                                .apply(fontSizeFactor: 2.0))),
                     Row(
                       children: [Icon(Icons.person), Text("0")],
                     )
@@ -93,12 +119,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
                 SizedBox(
                   height: 30,
                 ),
-                Text('We move under cover and we move as one'),
-                Text('Through the night, we have one shot to live another day'),
-                Text('We cannot let a stray gunshot give us away'),
-                Text('We will fight up close, seize the moment and stay in it'),
-                Text('It’s either that or meet the business end of a bayonet'),
-                Text('The code word is ‘Rochambeau,’ dig me?'),
+                Text(listaRutas[index].getDescripcion()),
                 Row(
                   children: [
                     FlatButton(
