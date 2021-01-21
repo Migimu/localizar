@@ -49,10 +49,6 @@ class _mapState extends State<map> {
 
   /*@override
   void main(List<String> args) {}*/
-  void setCustomMapPin() async {
-    pinLocationIcon = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2.5), 'images/pregunta.png');
-  }
 
   Future<Position> _getCurrentLocation() async {
     return Future(() {
@@ -93,6 +89,9 @@ class _mapState extends State<map> {
           _currentPosition.longitude,
           circulo.center.latitude,
           circulo.center.longitude);
+
+      pinLocationIcon = await BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(devicePixelRatio: 2.5), 'images/pregunta.png');
       if (distancia < 200) {
         setState(() {
           _isVisible = true;
@@ -200,7 +199,11 @@ class _mapState extends State<map> {
                   Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Container(
-                    child: Center(child: Text("Lo has logrado!")),
+                    child: Center(
+                        child: Text(
+                      "Lo has logrado!",
+                      style: TextStyle(fontFamily: 'Arcade'),
+                    )),
                     height: 100,
                     width: 200,
                     color: Colors.amber,
