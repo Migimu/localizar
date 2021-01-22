@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:geo_explorer/models/localizacion.dart';
@@ -13,152 +14,193 @@ class SwiperRutas extends StatefulWidget {
 }
 
 class _SwiperRutasState extends State<SwiperRutas> {
-  List<Ruta> listaRutas = [];
+  List listaRutas = [];
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
 
   @override
   void initState() {
     super.initState();
-    API.getRutas().then((response) {
-      Ruta ruta = new Ruta("", "", "", "", 0, "", "", "", 0, []);
-      for (var json in response) {
-        print(json["id"]);
+  }
 
-        ruta.setId(json["id"]);
-
-        ruta.setNombre(json["nombre"]);
-
-        ruta.setCiudad(json["ciudad"]);
-
-        ruta.setTamatica(json["tematica"]);
-
-        ruta.setDuracion(json["duracion"]);
-
-        ruta.setDescripcion(json["descripcion"]);
-
-        ruta.setTransporte(json["transporte"]);
-
-        ruta.setImagen(json["imagen"]);
-
-        ruta.setDificultad(json["dificultad"]);
-
-        listaRutas.add(ruta);
-      }
+  Future<List> getData() async {
+    return await API.getRutas().then((response) {
+      return response;
     });
   }
 
-  final imageList = [
-    'https://cdn.pixabay.com/photo/2016/03/05/19/02/hamburger-1238246__480.jpg',
-    'https://cdn.pixabay.com/photo/2016/11/20/09/06/bowl-1842294__480.jpg',
-    'https://cdn.pixabay.com/photo/2017/01/03/11/33/pizza-1949183__480.jpg',
-    'https://cdn.pixabay.com/photo/2017/02/03/03/54/burger-2034433__480.jpg',
-  ];
-  var dropdownValue = "One";
+  List<String> ciudades = [];
+  var dropdownValue;
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Scaffold(
-          body: Column(children: <Widget>[
-        SizedBox(
-          height: 10,
-        ),
-        DropdownButton<String>(
-          value: dropdownValue,
-          icon: Icon(Icons.arrow_downward),
-          iconSize: 24,
-          elevation: 16,
-          style: TextStyle(color: Colors.deepPurple),
-          underline: Container(
-            height: 2,
-            color: Colors.deepPurpleAccent,
-          ),
-          onChanged: (String newValue) {
-            setState(() {
-              dropdownValue = newValue;
-            });
-          },
-          items: <String>['One', 'Two', 'Free', 'Four']
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-        Swiper(
-          layout: SwiperLayout.TINDER,
-          itemCount: listaRutas.length,
-          itemBuilder: (context, index) {
-            return Container(
-              child: Column(children: <Widget>[
+        child: Scaffold(
+      body: FutureBuilder<List>(
+          future: getData(),
+          builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+            if (snapshot.hasData) {
+              dropdownValue = snapshot.data[0]['ciudad'];
+              print(snapshot.data.length);
+              var esta = false;
+              for (var ruta in snapshot.data) {
+                for (var ciudad in ciudades) {
+                  if (ciudad == ruta['ciudad']) {
+                    esta = true;
+                  }
+                }
+                if (!esta) {
+                  ciudades.add(ruta['ciudad']);
+                }
+              }
+
+              return Column(children: <Widget>[
                 SizedBox(
-                  height: 30,
+                  height: 10,
                 ),
-                Image.network(
-                  imageList[index],
-                  fit: BoxFit.cover,
-                  height: 200,
-                  width: 300,
+                DropdownButton<String>(
+                  value: dropdownValue,
+                  icon: Icon(Icons.arrow_downward),
+                  iconSize: 24,
+                  elevation: 16,
+                  style: TextStyle(color: Colors.deepPurple),
+                  underline: Container(
+                    height: 2,
+                    color: Colors.deepPurpleAccent,
+                  ),
+                  onChanged: (String newValue) {
+                    setState(() {
+                      dropdownValue = newValue;
+                    });
+                  },
+                  items: ciudades.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+                Swiper(
+                  layout: SwiperLayout.TINDER,
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (context, index) {
+                    var imagen = snapshot.data[index]['imagen'];
+                    var imagenValida;
+
+                    print(imagen);
+                    print(snapshot.data[0]['imagen']);
+
+                    //print(imagen.substring(imagen.length - 4, imagen.length));
+
+                    if (imagen == "" ||
+                        imagen.substring(imagen.length - 4, imagen.length) ==
+                            ".jpg" ||
+                        null) {
+                      imagenValida = AssetImage("images/explorer.png");
+                    } else {
+                      imagenValida = imagen;
+                    }
+                    return Container(
+                      child: Column(children: <Widget>[
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Container(
+                          child: Image(
+                            image: imagenValida,
+                            height: 200,
+                            width: 300,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            SizedBox(),
+                            Flexible(
+                                child: Text(snapshot.data[index]['nombre'],
+                                    style: DefaultTextStyle.of(context)
+                                        .style
+                                        .apply(fontSizeFactor: 2.0))),
+                            Row(
+                              children: [Icon(Icons.person), Text("0")],
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.60,
+                            height: MediaQuery.of(context).size.width * 0.40,
+                            child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                        snapshot.data[index]['descripcion']),
+                                  ),
+                                  Row(
+                                    children: [
+                                      FlatButton(
+                                        color: Colors.blue[300],
+                                        onPressed: () {
+                                          /*****************INICIAR RUTA****************** */
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => Pages(
+                                                      localizacionesList: snapshot
+                                                              .data[index][
+                                                          'listaLocalizaciones'],
+                                                    )),
+                                          );
+                                        },
+                                        child: Icon(Icons.check),
+                                      ),
+                                      SizedBox(
+                                        width: 20,
+                                      )
+                                    ],
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                  )
+                                ]))
+                      ]),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        border: Border.all(width: 3.0),
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                      ),
+                    );
+                  },
+                  itemWidth: MediaQuery.of(context).size.width * 0.80,
+                  itemHeight: MediaQuery.of(context).size.height * 0.80,
                 ),
                 SizedBox(
-                  height: 30,
+                  height: 15,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    SizedBox(),
-                    Flexible(
-                        child: Text(listaRutas[index].getNombre(),
-                            style: DefaultTextStyle.of(context)
-                                .style
-                                .apply(fontSizeFactor: 2.0))),
-                    Row(
-                      children: [Icon(Icons.person), Text("0")],
-                    )
-                  ],
+                FloatingActionButton.extended(
+                  onPressed: () {},
+                  label: Text("RANKING"),
                 ),
-                SizedBox(
-                  height: 30,
+              ]);
+            } else if (snapshot.hasError) {
+              return Column(children: [
+                Icon(
+                  Icons.error_outline,
+                  color: Colors.red,
+                  size: 60,
                 ),
-                Text(listaRutas[index].getDescripcion()),
-                Row(
-                  children: [
-                    FlatButton(
-                      color: Colors.blue[300],
-                      onPressed: () {
-                        /*****************INICIAR RUTA****************** */
-                        print("object");
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Pages()),
-                        );
-                      },
-                      child: Icon(Icons.check),
-                    ),
-                    SizedBox(
-                      width: 20,
-                    )
-                  ],
-                  mainAxisAlignment: MainAxisAlignment.end,
+                Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text('Error: ${snapshot.error}'),
                 )
-              ]),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                border: Border.all(width: 3.0),
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              ),
-            );
-          },
-          itemWidth: MediaQuery.of(context).size.width * 0.80,
-          itemHeight: MediaQuery.of(context).size.height * 0.80,
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        FloatingActionButton.extended(
-          onPressed: () {},
-          label: Text("RANKING"),
-        )
-      ])),
-    );
+              ]);
+            } else {
+              return Text("loading ...");
+            }
+          }),
+    ));
   }
 }

@@ -4,16 +4,21 @@ import 'package:geo_explorer/widget/map.dart';
 import 'package:geo_explorer/widget/chat.dart';
 
 class Pages extends StatefulWidget {
-  Pages({Key key, this.title}) : super(key: key);
+  Pages({Key key, @required this.localizacionesList}) : super(key: key);
 
-  final String title;
+  final List localizacionesList;
 
   @override
-  _PagesState createState() => _PagesState();
+  _PagesState createState() => _PagesState(localizacionesList);
 }
 
 class _PagesState extends State<Pages> {
-  var _currentLocation;
+  var localizacionesList = [];
+
+  _PagesState(List localizaciones) {
+    this.localizacionesList = localizaciones;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -27,7 +32,7 @@ class _PagesState extends State<Pages> {
           color: Colors.deepPurple,
         ),
         map(
-          posicion: _currentLocation,
+          localizaciones: localizacionesList,
         ),
         Chat(),
       ],
