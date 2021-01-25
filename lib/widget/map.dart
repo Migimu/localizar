@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:geo_explorer/widget/dialog.dart';
@@ -7,22 +8,22 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 //import 'package:permission_handler/permission_handler.dart';
 
-class map extends StatefulWidget {
+class Mapa extends StatefulWidget {
   final List localizaciones;
 
-  map({Key key, @required this.localizaciones}) : super(key: key);
+  Mapa({Key key, @required this.localizaciones}) : super(key: key);
 
   @override
-  _mapState createState() => _mapState(localizaciones);
+  _MapaState createState() => _MapaState(localizaciones);
 }
 
-class _mapState extends State<map> {
+class _MapaState extends State<Mapa> {
   var localizaciones = [];
   MapType _defaultMapType = MapType.normal;
   bool _isVisible = false;
   BitmapDescriptor pinLocationIcon;
 
-  _mapState(List localizaciones) {
+  _MapaState(List localizaciones) {
     this.localizaciones = localizaciones;
   }
 
@@ -128,23 +129,23 @@ class _mapState extends State<map> {
   }
 
   void _setCircles() {
-    setState(() {
-      _circles.add(Circle(
-          circleId: CircleId("1"),
-          center: LatLng(43.3141039075075, -1.883062156365791),
-          radius: 200,
-          visible: false));
-      _circles.add(Circle(
-        circleId: CircleId("2"),
-        center: LatLng(43.3141039075075, -1.873062156365791),
-        radius: 200,
-      ));
-      _circles.add(Circle(
-        circleId: CircleId("3"),
-        center: LatLng(43.3141039075075, -1.863062156365791),
-        radius: 200,
-      ));
-    });
+    var cont = 0;
+    print(localizaciones[0]["latitud"]);
+    /*for (var localizacion in localizaciones) {
+      print(localizacion.toList());
+      //Json json = jsonEncode(localizacion);
+      //print(json["_id"]);
+      print(localizacion[0]["latitud"]);
+      setState(() {
+        _circles.add(Circle(
+            circleId: CircleId("$cont"),
+            center:
+                LatLng(localizacion[0]["latitud"], localizacion[0]["longitud"]),
+            radius: 200,
+            visible: false));
+      });
+      cont++;
+    }*/
   }
 
   @override

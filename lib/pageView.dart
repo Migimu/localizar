@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:geo_explorer/widget/map.dart';
 import 'package:geo_explorer/widget/chat.dart';
+import 'package:geo_explorer/widget/map.dart';
 
 class Pages extends StatefulWidget {
   Pages({Key key, @required this.localizacionesList}) : super(key: key);
@@ -31,7 +31,7 @@ class _PagesState extends State<Pages> {
         Container(
           color: Colors.deepPurple,
         ),
-        map(
+        Mapa(
           localizaciones: localizacionesList,
         ),
         Chat(),
