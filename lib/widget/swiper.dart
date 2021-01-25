@@ -1,10 +1,9 @@
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:geo_explorer/models/localizacion.dart';
-import 'package:geo_explorer/models/ruta.dart';
 import 'package:geo_explorer/pageView.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
+import 'package:geo_explorer/widget/ranking.dart';
 
 class SwiperRutas extends StatefulWidget {
   SwiperRutas({Key key}) : super(key: key);
@@ -42,7 +41,9 @@ class _SwiperRutasState extends State<SwiperRutas> {
               print(snapshot.data.length);
               var esta = false;
               for (var ruta in snapshot.data) {
+                //print(ruta['ciudad']);
                 for (var ciudad in ciudades) {
+                  print(ciudad == ruta['ciudad']);
                   if (ciudad == ruta['ciudad']) {
                     esta = true;
                   }
@@ -181,7 +182,11 @@ class _SwiperRutasState extends State<SwiperRutas> {
                   height: 15,
                 ),
                 FloatingActionButton.extended(
-                  onPressed: () {},
+                  onPressed: () {
+                    /*****************INICIAR RUTA****************** */
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Ranking()));
+                  },
                   label: Text("RANKING"),
                 ),
               ]);
@@ -198,7 +203,9 @@ class _SwiperRutasState extends State<SwiperRutas> {
                 )
               ]);
             } else {
-              return Text("loading ...");
+              return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Center(child: CircularProgressIndicator())]);
             }
           }),
     ));

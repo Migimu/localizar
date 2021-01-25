@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:geo_explorer/widget/chat.dart';
+import 'package:geo_explorer/widget/informacion.dart';
 import 'package:geo_explorer/widget/map.dart';
 
 class Pages extends StatefulWidget {
@@ -28,9 +29,7 @@ class _PagesState extends State<Pages> {
   Widget build(BuildContext context) {
     return PageView(
       children: <Widget>[
-        Container(
-          color: Colors.deepPurple,
-        ),
+        InfoPage(),
         Mapa(
           localizaciones: localizacionesList,
         ),

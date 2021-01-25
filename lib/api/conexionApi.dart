@@ -64,4 +64,15 @@ class API {
       return null;
     }
   }
+
+  static Future getPuntuacion(var id) async {
+    var url = baseUrl + "/rutaUsuarios/getAllByRutaId/$id";
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      var responseJson = json.decode(response.body);
+      return responseJson;
+    } else {
+      return null;
+    }
+  }
 }

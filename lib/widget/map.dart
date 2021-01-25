@@ -22,6 +22,7 @@ class _MapaState extends State<Mapa> {
   MapType _defaultMapType = MapType.normal;
   bool _isVisible = false;
   BitmapDescriptor pinLocationIcon;
+  bool seguir = false;
 
   _MapaState(List localizaciones) {
     this.localizaciones = localizaciones;
@@ -47,9 +48,6 @@ class _MapaState extends State<Mapa> {
     _distanceFromCircle();
   }
 
-  /*@override
-  void main(List<String> args) {}*/
-
   Future<Position> _getCurrentLocation() async {
     return Future(() {
       return Geolocator.getCurrentPosition(
@@ -65,16 +63,23 @@ class _MapaState extends State<Mapa> {
     LatLng latLngPosition =
         LatLng(_currentPosition.latitude, _currentPosition.longitude);
 
-    /*setState(() {
-      _markers.clear();
-      _markers.add(Marker(markerId: MarkerId("1"), position: latLngPosition));
-    });*/
-
     CameraPosition cameraPosition =
         new CameraPosition(target: latLngPosition, zoom: 14);
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-    //_moveMarker();
+  }
+
+  Future<void> _followUser() async {
+    while (seguir) {
+      _currentPosition = await _getCurrentLocation();
+      LatLng latLngPosition =
+          LatLng(_currentPosition.latitude, _currentPosition.longitude);
+
+      CameraPosition cameraPosition =
+          new CameraPosition(target: latLngPosition, zoom: 16);
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    }
   }
 
   Future<void> _distanceFromCircle() async {
@@ -95,17 +100,27 @@ class _MapaState extends State<Mapa> {
       if (distancia < 200) {
         setState(() {
           _isVisible = true;
+
           _markers.add(Marker(
               markerId: MarkerId("$cont"),
               position: circulo.center,
               consumeTapEvents: false,
               icon: pinLocationIcon,
               onTap: () {
-                showDialog(
-                    child: Dialog(
-                      child: Pregunta(),
-                    ),
-                    context: context);
+                for (var localizacion in localizaciones) {
+                  var json = jsonDecode(localizacion);
+                  if (json['latitud'] == circulo.center.latitude &&
+                      json['longitud'] == circulo.center.longitude) ;
+
+                  showDialog(
+                      child: Dialog(
+                        child: Pregunta(
+                          pregunta: json['pregunta'],
+                        ),
+                      ),
+                      context: context);
+                  break;
+                }
               }));
         });
         cont++;
@@ -130,28 +145,26 @@ class _MapaState extends State<Mapa> {
 
   void _setCircles() {
     var cont = 0;
-    print(localizaciones[0]["latitud"]);
-    /*for (var localizacion in localizaciones) {
-      print(localizacion.toList());
-      //Json json = jsonEncode(localizacion);
-      //print(json["_id"]);
-      print(localizacion[0]["latitud"]);
+    print(localizaciones);
+    for (var localizacion in localizaciones) {
+      var json = jsonDecode(localizacion);
+      print(json["latitud"]);
       setState(() {
         _circles.add(Circle(
             circleId: CircleId("$cont"),
-            center:
-                LatLng(localizacion[0]["latitud"], localizacion[0]["longitud"]),
+            center: LatLng(json["latitud"], json["longitud"]),
             radius: 200,
-            visible: false));
+            visible: true));
       });
       cont++;
-    }*/
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         actions: [
           Icon(
             Icons.perm_identity,
@@ -173,6 +186,7 @@ class _MapaState extends State<Mapa> {
               circles: _circles,
               mapToolbarEnabled: false,
               mapType: _defaultMapType,
+              myLocationButtonEnabled: false,
             ),
           ),
 
@@ -180,16 +194,32 @@ class _MapaState extends State<Mapa> {
 
           //MultiDragGestureRecognizer(debugOwner: null),
           Container(
-            margin: EdgeInsets.only(top: 80, right: 10),
+            margin: EdgeInsets.only(top: 20, right: 10),
             alignment: Alignment.topRight,
             child: Column(children: <Widget>[
               FloatingActionButton(
+                  heroTag: 'map',
                   child: Icon(Icons.layers),
                   elevation: 5,
                   backgroundColor: Colors.teal[200],
                   onPressed: () {
                     _changeMapType();
-                    print('Changing the Map Type');
+                  }),
+              SizedBox(
+                height: 10,
+              ),
+              FloatingActionButton(
+                  heroTag: 'follow',
+                  child: Icon(Icons.my_location),
+                  elevation: 5,
+                  backgroundColor: Colors.teal[200],
+                  onPressed: () {
+                    if (seguir) {
+                      seguir = false;
+                    } else {
+                      seguir = true;
+                      _followUser();
+                    }
                   }),
             ]),
           ),

@@ -1,61 +1,92 @@
 import 'package:flutter/material.dart';
 
 class Pregunta extends StatefulWidget {
-  Pregunta({Key key}) : super(key: key);
+  final pregunta;
+
+  Pregunta({Key key, @required this.pregunta}) : super(key: key);
 
   @override
-  _PreguntaState createState() => _PreguntaState();
+  _PreguntaState createState() => _PreguntaState(pregunta);
 }
 
 class _PreguntaState extends State<Pregunta> {
+  var pregunta;
   var valor = "A";
+
+  _PreguntaState(var pregunta) {
+    this.pregunta = pregunta;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       child: ListView(
         padding: const EdgeInsets.all(8),
         children: <Widget>[
-          Align(child: Text("RESPONDE")),
-          Image(
-            image: NetworkImage(
-                'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg'),
-          ),
-          ListTile(
-            title: const Text('Pregunta A'),
-            leading: Radio(
-              value: "A",
-              groupValue: valor,
-              onChanged: (String value) {
-                setState(() {
-                  valor = value;
-                });
-              },
-            ),
-          ),
-          ListTile(
-              title: const Text('Pregunta B'),
-              leading: Radio(
-                value: "B",
-                groupValue: valor,
-                onChanged: (String value) {
-                  setState(() {
-                    valor = value;
-                  });
-                },
-              )),
-          ListTile(
-              title: const Text('Pregunta C'),
-              leading: Radio(
-                value: "C",
-                groupValue: valor,
-                onChanged: (String value) {
-                  setState(() {
-                    valor = value;
-                  });
-                },
-              )),
-          FloatingActionButton.extended(
-              onPressed: null, label: Icon(Icons.check))
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Align(
+                  child: Text(pregunta['pregunta'],
+                      style: TextStyle(fontFamily: 'Arcade'))),
+              SizedBox(
+                height: 5,
+              ),
+              Container(
+                height: 200,
+                width: 200,
+                child: Image(
+                    image: NetworkImage(
+                        'https://flutter.github.io/assets-for-api-docs/assets/widgets/owl.jpg')),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(25.0))),
+              ),
+              ListTile(
+                title: Text(pregunta['respuesta1']),
+                leading: Radio(
+                  value: "A",
+                  groupValue: valor,
+                  onChanged: (String value) {
+                    setState(() {
+                      valor = value;
+                    });
+                  },
+                ),
+              ),
+              ListTile(
+                  title: Text(pregunta['respuesta2']),
+                  leading: Radio(
+                    value: "B",
+                    groupValue: valor,
+                    onChanged: (String value) {
+                      setState(() {
+                        valor = value;
+                      });
+                    },
+                  )),
+              ListTile(
+                  title: Text(pregunta['respuesta3']),
+                  leading: Radio(
+                    value: "C",
+                    groupValue: valor,
+                    onChanged: (String value) {
+                      setState(() {
+                        valor = value;
+                      });
+                    },
+                  )),
+              FloatingActionButton.extended(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    print(pregunta['correcta']);
+                    print(valor);
+                    if (valor == pregunta['correcta']) {
+                      print('has acertado');
+                    }
+                  },
+                  label: Icon(Icons.check))
+            ],
+          )
         ],
       ),
     );
