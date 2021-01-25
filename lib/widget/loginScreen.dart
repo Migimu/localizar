@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:geo_explorer/widget/swiper.dart';
-import 'package:geo_explorer/widget/loginCorrect.dart';
 import 'package:geo_explorer/widget/registerScreen.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
 
@@ -22,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
     API.getUsers().then((response) {
       lista = response;
     });
+    super.initState();
   }
 
   /* CONSTANTES */

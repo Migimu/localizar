@@ -1,4 +1,3 @@
-import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:geo_explorer/pageView.dart';
@@ -14,7 +13,6 @@ class SwiperRutas extends StatefulWidget {
 
 class _SwiperRutasState extends State<SwiperRutas> {
   List listaRutas = [];
-  final AsyncMemoizer _memoizer = AsyncMemoizer();
 
   @override
   void initState() {
@@ -38,12 +36,11 @@ class _SwiperRutasState extends State<SwiperRutas> {
           builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
             if (snapshot.hasData) {
               dropdownValue = snapshot.data[0]['ciudad'];
-              print(snapshot.data.length);
+
               var esta = false;
               for (var ruta in snapshot.data) {
                 //print(ruta['ciudad']);
                 for (var ciudad in ciudades) {
-                  print(ciudad == ruta['ciudad']);
                   if (ciudad == ruta['ciudad']) {
                     esta = true;
                   }
@@ -68,6 +65,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
                     color: Colors.deepPurpleAccent,
                   ),
                   onChanged: (String newValue) {
+                    print(newValue);
                     setState(() {
                       dropdownValue = newValue;
                     });
@@ -85,11 +83,6 @@ class _SwiperRutasState extends State<SwiperRutas> {
                   itemBuilder: (context, index) {
                     var imagen = snapshot.data[index]['imagen'];
                     var imagenValida;
-
-                    print(imagen);
-                    print(snapshot.data[0]['imagen']);
-
-                    //print(imagen.substring(imagen.length - 4, imagen.length));
 
                     if (imagen == "" ||
                         imagen.substring(imagen.length - 4, imagen.length) ==

@@ -12,7 +12,7 @@ class Ruta {
   int _dificultad;
   List<Localizacion> _listaLocalizaciones;
 
-  Ruta.empty() {}
+  Ruta.empty();
 
   Ruta(
       String id,

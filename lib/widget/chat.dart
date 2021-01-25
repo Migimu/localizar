@@ -28,31 +28,6 @@ class _ChatState extends State<Chat> {
           onSend: (ChatMessage) {
             mensajes.add(ChatMessage);
           },
-        ) /*Column(
-        children: [
-          Container(
-            //height: MediaQuery.of(context).size.height * 0.9,
-            //width: MediaQuery.of(context).size.width,
-            height: 50,
-            width: 50,
-          ),
-          Expanded(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                width: 200,
-                child: TextField(),
-                decoration: BoxDecoration(border: Border.all()),
-              ),
-              FloatingActionButton(
-                onPressed: () {},
-                child: Icon(Icons.send),
-              )
-            ],
-          )),
-        ],
-      ),*/
-        );
+        ));
   }
 }

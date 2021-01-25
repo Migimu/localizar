@@ -110,16 +110,16 @@ class _MapaState extends State<Mapa> {
                 for (var localizacion in localizaciones) {
                   var json = jsonDecode(localizacion);
                   if (json['latitud'] == circulo.center.latitude &&
-                      json['longitud'] == circulo.center.longitude) ;
-
-                  showDialog(
-                      child: Dialog(
-                        child: Pregunta(
-                          pregunta: json['pregunta'],
+                      json['longitud'] == circulo.center.longitude) {
+                    showDialog(
+                        child: Dialog(
+                          child: Pregunta(
+                            pregunta: json['pregunta'],
+                          ),
                         ),
-                      ),
-                      context: context);
-                  break;
+                        context: context);
+                    break;
+                  }
                 }
               }));
         });
