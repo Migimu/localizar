@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:geo_explorer/pageView.dart';
+import 'package:geo_explorer/pages/pageView.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
 import 'package:geo_explorer/widget/ranking.dart';
 

@@ -1,123 +1,119 @@
+import 'package:flutter/material.dart';
 import 'package:geo_explorer/models/localizacion.dart';
+import 'package:provider/provider.dart';
+
+class Rutas with ChangeNotifier {
+  List<Ruta> items = new List();
+
+  Rutas({this.items});
+}
 
 class Ruta {
-  String _id;
-  String _nombre;
-  String _ciudad;
-  String _tematica;
-  double _duracion;
-  String _descripcion;
-  String _transporte;
-  String _imagen;
-  int _dificultad;
-  List<Localizacion> _listaLocalizaciones;
+  String id;
+  String nombre;
+  String ciudad;
+  String tematica;
+  double duracion;
+  String descripcion;
+  String transporte;
+  String imagen;
+  int dificultad;
+  List<Localizacion> listaLocalizaciones;
 
   Ruta.empty();
 
   Ruta(
-      String id,
-      String nombre,
-      String ciudad,
-      String tematica,
-      double duracion,
-      String descripcion,
-      String transporte,
-      String imagen,
-      int dificultad,
-      List<Localizacion> listaLocalizaciones) {
-    this._id = id;
-    this._nombre = nombre;
-    this._ciudad = ciudad;
-    this._tematica = tematica;
-    this._duracion = duracion;
-    this._descripcion = descripcion;
-    this._transporte = transporte;
-    this._imagen = imagen;
-    this._dificultad = dificultad;
-    this._listaLocalizaciones = listaLocalizaciones;
-  }
-
+      {this.id,
+      this.nombre,
+      this.ciudad,
+      this.tematica,
+      this.duracion,
+      this.descripcion,
+      this.transporte,
+      this.imagen,
+      this.dificultad,
+      this.listaLocalizaciones});
 //GETTERS
 
   String getId() {
-    return this._id;
+    return this.id;
   }
 
   String getNombre() {
-    return this._nombre;
+    return this.nombre;
   }
 
   String getCiudad() {
-    return this._ciudad;
+    return this.ciudad;
   }
 
   String getTamatica() {
-    return this._tematica;
+    return this.tematica;
   }
 
   double getDuracion() {
-    return this._duracion;
+    return this.duracion;
   }
 
   String getDescripcion() {
-    return this._descripcion;
+    return this.descripcion;
   }
 
   String getTransporte() {
-    return this._transporte;
+    return this.transporte;
   }
 
   String getImagen() {
-    return this._imagen;
+    return this.imagen;
   }
 
   int getDificultad() {
-    return this._dificultad;
+    return this.dificultad;
   }
 
   List<Localizacion> getListaLocalizaciones() {
-    return this._listaLocalizaciones;
+    return this.listaLocalizaciones;
   }
 
   //SETTERS
 
   void setId(String id) {
-    this._id = id;
+    this.id = id;
   }
 
   void setNombre(String nombre) {
-    this._nombre = nombre;
+    this.nombre = nombre;
   }
 
   void setCiudad(String ciudad) {
-    this._ciudad = ciudad;
+    this.ciudad = ciudad;
   }
 
   void setTamatica(String tematica) {
-    this._tematica = tematica;
+    this.tematica = tematica;
   }
 
   void setDuracion(double duracion) {
-    this._duracion = duracion;
+    this.duracion = duracion;
   }
 
   void setDescripcion(String descripcion) {
-    this._descripcion = descripcion;
+    this.descripcion = descripcion;
   }
 
   void setTransporte(String transporte) {
-    this._transporte = transporte;
+    this.transporte = transporte;
   }
 
   void setImagen(String imagen) {
-    this._imagen = imagen;
+    this.imagen = imagen;
   }
 
   void setDificultad(int dificultad) {
-    this._dificultad = dificultad;
+    this.dificultad = dificultad;
   }
 
   void setListaLocalizaciones(List localizaciones) {
-    this._listaLocalizaciones = localizaciones;
+    this.listaLocalizaciones = localizaciones;
   }
 }

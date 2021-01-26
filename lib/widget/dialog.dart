@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geo_explorer/widget/map.dart';
 
 class Pregunta extends StatefulWidget {
   final pregunta;

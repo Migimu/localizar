@@ -64,7 +64,7 @@ class InfoPage extends StatelessWidget {
                   Container(
                     width: MediaQuery.of(context).size.width *
                         0.80, //80% de la pantalla
-                    height: 100,
+                    height: 500,
                     decoration: BoxDecoration(
                         color: Color.fromRGBO(198, 218, 191, 1),
                         border: Border.all(
@@ -83,9 +83,22 @@ class InfoPage extends StatelessWidget {
                             ),
                           ),
                           SizedBox(height: 10),
-                          Text("calle aaaaaaaaaa"),
-                          Text("plaza bbbbbbbb"),
-                          Text("avenida bbbbbbbb"),
+                          Stepper(steps: [
+                            Step(
+                                isActive: false,
+                                title: Text("Localizacion 1"),
+                                content: Icon(Icons.gps_fixed)),
+                            Step(
+                                isActive: true,
+                                title: Text("Localizacion 2"),
+                                content: Icon(Icons.gps_fixed)),
+                            Step(
+                                title: Text("Localizacion 3"),
+                                content: Icon(Icons.gps_fixed)),
+                            Step(
+                                title: Text("Localizacion 4"),
+                                content: Icon(Icons.gps_fixed))
+                          ])
                         ]),
                   ),
                   SizedBox(height: 10),
