@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:geo_explorer/models/localizacion.dart';
+import 'package:geo_explorer/models/ruta.dart';
 import 'package:geo_explorer/pages/pageView.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
 import 'package:geo_explorer/widget/ranking.dart';
+import 'package:provider/provider.dart';
 
 class SwiperRutas extends StatefulWidget {
   SwiperRutas({Key key}) : super(key: key);
@@ -29,6 +32,10 @@ class _SwiperRutasState extends State<SwiperRutas> {
   var dropdownValue;
   @override
   Widget build(BuildContext context) {
+    var ruta = Provider.of<Ruta>(context);
+
+    var rutas = Provider.of<Rutas>(context);
+
     return Container(
         child: Scaffold(
       body: FutureBuilder<List>(
@@ -39,6 +46,17 @@ class _SwiperRutasState extends State<SwiperRutas> {
 
               var esta = false;
               for (var ruta in snapshot.data) {
+                /*ruta.idR = ruta["id"];
+                ruta.setNombre(ruta["nombre"]);
+                ruta.setId(ruta["ciudad"]);
+                ruta.setId(ruta["tematica"]);
+                ruta.setId(ruta["duracion"]);
+                ruta.setId(ruta["descripcion"]);
+                ruta.setId(ruta["transporte"]);
+                ruta.setId(ruta["imagen"]);
+                ruta.setId(ruta["dificultad"]);
+                ruta.setId(ruta["listaLocalizaciones"]);
+                rutas.setRutas(ruta);*/
                 //print(ruta['ciudad']);
                 for (var ciudad in ciudades) {
                   if (ciudad == ruta['ciudad']) {

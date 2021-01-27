@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:geo_explorer/models/pregunta.dart';
 
-class Localiazaciones extends ChangeNotifier {
+class Localizaciones extends ChangeNotifier {
   List<Localizacion> items = new List();
 
-  Localiazaciones({this.items});
+  set localizaciones(Localizacion localizacion) {
+    items.add(localizacion);
+  }
+
+  Localizaciones({this.items});
 }
 
-class Localizacion {
+class Localizacion extends ChangeNotifier {
   String nombre;
   double latitud;
   double longitud;

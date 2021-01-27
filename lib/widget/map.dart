@@ -33,6 +33,7 @@ class _MapaState extends State<Mapa> {
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = HashSet<Marker>();
   Set<Circle> _circles = HashSet<Circle>();
+  Set<Polyline> _polylines = HashSet<Polyline>();
 
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
@@ -145,6 +146,7 @@ class _MapaState extends State<Mapa> {
 
   void _setCircles() {
     var cont = 0;
+    List<LatLng> _puntos = [];
     print(localizaciones);
     for (var localizacion in localizaciones) {
       var json = jsonDecode(localizacion);
@@ -156,8 +158,18 @@ class _MapaState extends State<Mapa> {
             radius: 200,
             visible: true));
       });
+      _puntos.add(LatLng(json["latitud"], json["longitud"]));
       cont++;
     }
+    // _puntos.add(LatLng(43.321613861083984, -2.006986047744751));
+    // _puntos.add(LatLng(43.329613861083984, -2.016986047744751));
+    // _puntos.add(LatLng(43.325613861083984, -2.000986047744751));
+    setState(() {
+      _polylines.add(Polyline(
+          polylineId: PolylineId("$cont"),
+          points: _puntos,
+          color: Colors.green));
+    });
   }
 
   @override
@@ -184,6 +196,7 @@ class _MapaState extends State<Mapa> {
               initialCameraPosition: _initialPosition,
               markers: _markers,
               circles: _circles,
+              polylines: _polylines,
               mapToolbarEnabled: false,
               mapType: _defaultMapType,
               myLocationButtonEnabled: false,

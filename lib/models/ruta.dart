@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:geo_explorer/models/localizacion.dart';
-import 'package:provider/provider.dart';
 
 class Rutas with ChangeNotifier {
   List<Ruta> items = new List();
 
+  void setRutas(Ruta ruta) {
+    items.add(ruta);
+  }
+
   Rutas({this.items});
 }
 
-class Ruta {
+class Ruta with ChangeNotifier {
   String id;
   String nombre;
   String ciudad;
@@ -20,7 +23,7 @@ class Ruta {
   int dificultad;
   List<Localizacion> listaLocalizaciones;
 
-  Ruta.empty();
+  //Ruta.empty();
 
   Ruta(
       {this.id,
@@ -77,43 +80,53 @@ class Ruta {
 
   //SETTERS
 
-  void setId(String id) {
+  set idR(String id) {
     this.id = id;
+    notifyListeners();
   }
 
   void setNombre(String nombre) {
     this.nombre = nombre;
+    notifyListeners();
   }
 
   void setCiudad(String ciudad) {
     this.ciudad = ciudad;
+    notifyListeners();
   }
 
   void setTamatica(String tematica) {
     this.tematica = tematica;
+    notifyListeners();
   }
 
   void setDuracion(double duracion) {
     this.duracion = duracion;
+    notifyListeners();
   }
 
   void setDescripcion(String descripcion) {
     this.descripcion = descripcion;
+    notifyListeners();
   }
 
   void setTransporte(String transporte) {
     this.transporte = transporte;
+    notifyListeners();
   }
 
   void setImagen(String imagen) {
     this.imagen = imagen;
+    notifyListeners();
   }
 
   void setDificultad(int dificultad) {
     this.dificultad = dificultad;
+    notifyListeners();
   }
 
   void setListaLocalizaciones(List localizaciones) {
     this.listaLocalizaciones = localizaciones;
+    notifyListeners();
   }
 }

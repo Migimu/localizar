@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geo_explorer/widget/map.dart';
+import 'package:provider/provider.dart';
 
 class Pregunta extends StatefulWidget {
   final pregunta;
@@ -20,6 +21,8 @@ class _PreguntaState extends State<Pregunta> {
 
   @override
   Widget build(BuildContext context) {
+    var preguntaP = Provider.of<Pregunta>(context);
+
     return Container(
       child: ListView(
         padding: const EdgeInsets.all(8),
