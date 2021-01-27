@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:geo_explorer/models/localizacion.dart';
@@ -32,9 +34,9 @@ class _SwiperRutasState extends State<SwiperRutas> {
   var dropdownValue;
   @override
   Widget build(BuildContext context) {
-    var ruta = Provider.of<Ruta>(context);
+    final ruta = Provider.of<Ruta>(context);
 
-    var rutas = Provider.of<Rutas>(context);
+    final rutas = Provider.of<Rutas>(context);
 
     return Container(
         child: Scaffold(
@@ -46,17 +48,17 @@ class _SwiperRutasState extends State<SwiperRutas> {
 
               var esta = false;
               for (var ruta in snapshot.data) {
-                /*ruta.idR = ruta["id"];
-                ruta.setNombre(ruta["nombre"]);
-                ruta.setId(ruta["ciudad"]);
-                ruta.setId(ruta["tematica"]);
-                ruta.setId(ruta["duracion"]);
-                ruta.setId(ruta["descripcion"]);
-                ruta.setId(ruta["transporte"]);
-                ruta.setId(ruta["imagen"]);
-                ruta.setId(ruta["dificultad"]);
-                ruta.setId(ruta["listaLocalizaciones"]);
-                rutas.setRutas(ruta);*/
+                // ruta.idR = ruta["id"];
+                // ruta.setNombre(ruta["nombre"]);
+                // ruta.setId(ruta["ciudad"]);
+                // ruta.setId(ruta["tematica"]);
+                // ruta.setId(ruta["duracion"]);
+                // ruta.setId(ruta["descripcion"]);
+                // ruta.setId(ruta["transporte"]);
+                // ruta.setId(ruta["imagen"]);
+                // ruta.setId(ruta["dificultad"]);
+                // ruta.setId(ruta["listaLocalizaciones"]);
+                // rutas.setRutas(ruta);
                 //print(ruta['ciudad']);
                 for (var ciudad in ciudades) {
                   if (ciudad == ruta['ciudad']) {
@@ -104,11 +106,20 @@ class _SwiperRutasState extends State<SwiperRutas> {
 
                     if (imagen == "" ||
                         imagen.substring(imagen.length - 4, imagen.length) ==
-                            ".jpg" ||
-                        null) {
-                      imagenValida = AssetImage("images/explorer.png");
+                            ".jpg") {
+                      imagenValida = Image(
+                        image: AssetImage("images/explorer.png"),
+                        height: 200,
+                        width: 300,
+                      );
                     } else {
-                      imagenValida = imagen;
+                      var imagen64 = base64.decode(imagen);
+
+                      imagenValida = Image.memory(
+                        imagen64,
+                        width: 100.0,
+                        height: 200.0,
+                      );
                     }
                     return Container(
                       child: Column(children: <Widget>[
@@ -116,11 +127,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
                           height: 15,
                         ),
                         Container(
-                          child: Image(
-                            image: imagenValida,
-                            height: 200,
-                            width: 300,
-                          ),
+                          child: imagenValida,
                         ),
                         SizedBox(
                           height: 30,

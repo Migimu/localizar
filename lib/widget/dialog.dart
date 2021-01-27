@@ -13,7 +13,7 @@ class Pregunta extends StatefulWidget {
 
 class _PreguntaState extends State<Pregunta> {
   var pregunta;
-  var valor = "A";
+  var valor = "1";
 
   _PreguntaState(var pregunta) {
     this.pregunta = pregunta;
@@ -21,7 +21,7 @@ class _PreguntaState extends State<Pregunta> {
 
   @override
   Widget build(BuildContext context) {
-    var preguntaP = Provider.of<Pregunta>(context);
+    //var preguntaP = Provider.of<Pregunta>(context);
 
     return Container(
       child: ListView(
@@ -48,7 +48,7 @@ class _PreguntaState extends State<Pregunta> {
               ListTile(
                 title: Text(pregunta['respuesta1']),
                 leading: Radio(
-                  value: "A",
+                  value: "1",
                   groupValue: valor,
                   onChanged: (String value) {
                     setState(() {
@@ -60,7 +60,7 @@ class _PreguntaState extends State<Pregunta> {
               ListTile(
                   title: Text(pregunta['respuesta2']),
                   leading: Radio(
-                    value: "B",
+                    value: "2",
                     groupValue: valor,
                     onChanged: (String value) {
                       setState(() {
@@ -71,7 +71,7 @@ class _PreguntaState extends State<Pregunta> {
               ListTile(
                   title: Text(pregunta['respuesta3']),
                   leading: Radio(
-                    value: "C",
+                    value: "3",
                     groupValue: valor,
                     onChanged: (String value) {
                       setState(() {
@@ -81,12 +81,13 @@ class _PreguntaState extends State<Pregunta> {
                   )),
               FloatingActionButton.extended(
                   onPressed: () {
-                    Navigator.pop(context);
-                    print(pregunta['correcta']);
-                    print(valor);
+                    //print(pregunta['correcta']);
+                    print("$valor dialog");
                     if (valor == pregunta['correcta']) {
                       print('has acertado');
                     }
+                    Navigator.pop(
+                        context, int.parse(valor) == pregunta['correcta']);
                   },
                   label: Icon(Icons.check))
             ],

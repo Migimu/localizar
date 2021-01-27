@@ -12,16 +12,16 @@ class Rutas with ChangeNotifier {
 }
 
 class Ruta with ChangeNotifier {
-  String id;
-  String nombre;
-  String ciudad;
-  String tematica;
-  double duracion;
-  String descripcion;
-  String transporte;
-  String imagen;
-  int dificultad;
-  List<Localizacion> listaLocalizaciones;
+  String id = "";
+  String nombre = "";
+  String ciudad = "";
+  String tematica = "";
+  double duracion = 0;
+  String descripcion = "";
+  String transporte = "";
+  String imagen = "";
+  int dificultad = 0;
+  List<Localizacion> listaLocalizaciones = [];
 
   //Ruta.empty();
 

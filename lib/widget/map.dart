@@ -22,6 +22,7 @@ class _MapaState extends State<Mapa> {
   MapType _defaultMapType = MapType.normal;
   bool _isVisible = false;
   BitmapDescriptor pinLocationIcon;
+  BitmapDescriptor pinAnswered;
   bool seguir = false;
 
   _MapaState(List localizaciones) {
@@ -57,9 +58,7 @@ class _MapaState extends State<Mapa> {
   }
 
   Future<void> _goToTheUser() async {
-    print(await _getCurrentLocation());
     _currentPosition = await _getCurrentLocation();
-    print(_currentPosition);
 
     LatLng latLngPosition =
         LatLng(_currentPosition.latitude, _currentPosition.longitude);
@@ -85,7 +84,6 @@ class _MapaState extends State<Mapa> {
 
   Future<void> _distanceFromCircle() async {
     _currentPosition = await _getCurrentLocation();
-    print(_currentPosition);
 
     var cont = 0;
 
@@ -97,29 +95,52 @@ class _MapaState extends State<Mapa> {
           circulo.center.longitude);
 
       pinLocationIcon = await BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(devicePixelRatio: 2.5), 'images/pregunta.png');
+          ImageConfiguration(devicePixelRatio: 5), 'images/pregunta.png');
+
+      pinAnswered = await BitmapDescriptor.fromAssetImage(
+          ImageConfiguration(devicePixelRatio: 5), 'images/comprobar.png');
+
       if (distancia < 200) {
         setState(() {
           _isVisible = true;
+          //print(localizaciones.length);
 
           _markers.add(Marker(
               markerId: MarkerId("$cont"),
               position: circulo.center,
               consumeTapEvents: false,
               icon: pinLocationIcon,
-              onTap: () {
+              onTap: () async {
                 for (var localizacion in localizaciones) {
                   var json = jsonDecode(localizacion);
+                  print(json['latitud']);
+                  print(circulo.center.latitude);
+                  print(json['longitud']);
+                  print(circulo.center.longitude);
                   if (json['latitud'] == circulo.center.latitude &&
                       json['longitud'] == circulo.center.longitude) {
-                    showDialog(
+                    var respuesta = await showDialog(
+                        barrierColor: Colors.green,
                         child: Dialog(
-                          child: Pregunta(
-                            pregunta: json['pregunta'],
-                          ),
-                        ),
+                            child: Pregunta(
+                          pregunta: json['pregunta'],
+                        )),
                         context: context);
-                    break;
+
+                    if (respuesta) {
+                      for (var marker in _markers) {
+                        if (marker.markerId == MarkerId("${cont - 1}")) {
+                          _markers.add(Marker(
+                              markerId: MarkerId("$cont"),
+                              position: circulo.center,
+                              consumeTapEvents: false,
+                              icon: pinAnswered,
+                              zIndex: 5,
+                              onTap: () {}));
+                          break;
+                        }
+                      }
+                    }
                   }
                 }
               }));
@@ -129,6 +150,8 @@ class _MapaState extends State<Mapa> {
       } else {
         setState(() {
           _isVisible = false;
+
+          _markers.removeWhere((item) => item.icon == pinLocationIcon);
         });
       }
     }
@@ -147,10 +170,8 @@ class _MapaState extends State<Mapa> {
   void _setCircles() {
     var cont = 0;
     List<LatLng> _puntos = [];
-    print(localizaciones);
     for (var localizacion in localizaciones) {
       var json = jsonDecode(localizacion);
-      print(json["latitud"]);
       setState(() {
         _circles.add(Circle(
             circleId: CircleId("$cont"),
@@ -161,9 +182,9 @@ class _MapaState extends State<Mapa> {
       _puntos.add(LatLng(json["latitud"], json["longitud"]));
       cont++;
     }
-    // _puntos.add(LatLng(43.321613861083984, -2.006986047744751));
-    // _puntos.add(LatLng(43.329613861083984, -2.016986047744751));
-    // _puntos.add(LatLng(43.325613861083984, -2.000986047744751));
+    /*_puntos.add(LatLng(43.321613861083984, -2.006986047744751));
+    _puntos.add(LatLng(43.329613861083984, -2.016986047744751));
+    _puntos.add(LatLng(43.325613861083984, -2.000986047744751));*/
     setState(() {
       _polylines.add(Polyline(
           polylineId: PolylineId("$cont"),
