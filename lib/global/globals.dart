@@ -1,3 +1,9 @@
 library geo_explorer.globals;
 
-bool respuesta;
+int puntuacion = 0;
+
+String usuarioNombre;
+
+var rutaUsuario;
+
+var usuario;

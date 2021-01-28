@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:geo_explorer/global/globals.dart';
 import 'package:geo_explorer/widget/dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -24,6 +25,7 @@ class _MapaState extends State<Mapa> {
   BitmapDescriptor pinLocationIcon;
   BitmapDescriptor pinAnswered;
   bool seguir = false;
+  int contRespondido = 0;
 
   _MapaState(List localizaciones) {
     this.localizaciones = localizaciones;
@@ -118,29 +120,39 @@ class _MapaState extends State<Mapa> {
                   print(circulo.center.latitude);
                   print(json['longitud']);
                   print(circulo.center.longitude);
-                  if (json['latitud'] == circulo.center.latitude &&
-                      json['longitud'] == circulo.center.longitude) {
+                  if (json['latitud'] ==
+                          circulo.center
+                              .latitude /*&&
+                      json['longitud'] == circulo.center.longitude*/
+                      ) {
                     var respuesta = await showDialog(
                         barrierColor: Colors.green,
+                        barrierDismissible: false,
                         child: Dialog(
                             child: Pregunta(
                           pregunta: json['pregunta'],
                         )),
                         context: context);
 
-                    if (respuesta) {
-                      for (var marker in _markers) {
-                        if (marker.markerId == MarkerId("${cont - 1}")) {
-                          _markers.add(Marker(
-                              markerId: MarkerId("$cont"),
-                              position: circulo.center,
-                              consumeTapEvents: false,
-                              icon: pinAnswered,
-                              zIndex: 5,
-                              onTap: () {}));
-                          break;
-                        }
+                    for (var marker in _markers) {
+                      if (marker.markerId == MarkerId("${cont - 1}")) {
+                        _markers.add(Marker(
+                            markerId: MarkerId("$cont"),
+                            position: circulo.center,
+                            consumeTapEvents: false,
+                            icon: pinAnswered,
+                            zIndex: 5,
+                            onTap: () {}));
+                        break;
                       }
+                    }
+                    if (respuesta) {
+                      puntuacion = puntuacion + 10;
+                    }
+                    contRespondido++;
+                    if (contRespondido == _circles.length) {
+                      //FINALIZAR JUEGO
+                      print("has terminado");
                     }
                   }
                 }
@@ -178,7 +190,9 @@ class _MapaState extends State<Mapa> {
             circleId: CircleId("$cont"),
             center: LatLng(json["latitud"], json["longitud"]),
             radius: 200,
+            zIndex: 0,
             visible: true));
+        _puntos.add(LatLng(json["latitud"], json["longitud"]));
       });
       cont++;
     }

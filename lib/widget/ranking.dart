@@ -61,6 +61,7 @@ class _RankingState extends State<Ranking> {
         FutureBuilder<List>(
             future: getData(id),
             builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+              print(id);
               if (snapshot.hasData) {
                 var pos;
                 var i = 1;

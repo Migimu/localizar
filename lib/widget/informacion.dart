@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
+import 'package:geo_explorer/global/globals.dart';
 import 'package:geo_explorer/widget/swiper.dart';
 
 class InfoPage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _InfoPageState extends State<InfoPage> {
   }
 
   Future<List> _getUsuariosRanking() async {
-    return await API.getPuntuacion(rutaList["_id"]).then((response) {
+    return await API.getPuntuacion(rutaList["id"]).then((response) {
       return response;
     });
   }
@@ -140,15 +141,30 @@ class _InfoPageState extends State<InfoPage> {
                                                     fontFamily: 'Arcade')),
                                           )
                                         ];
-
+                                        var i = 1;
+                                        var pos;
                                         if (snapshot.hasData) {
                                           for (var usuario in snapshot.data) {
+                                            if (i == 1) {
+                                              pos = "1ST";
+                                            } else if (i == 2) {
+                                              pos = "2ND";
+                                            } else if (i == 3) {
+                                              pos = "3RD";
+                                            } else {
+                                              pos = "${i}TH";
+                                            }
                                             listaColumn
                                                 .add(SizedBox(height: 10));
                                             listaColumn.add(Text(
-                                                '1ST AAAAA ${usuario["puntuacion"]}',
+                                                '$pos ${usuario["usuario"]} ${usuario["puntuacion"]}',
                                                 style: TextStyle(
-                                                    fontFamily: 'Arcade')));
+                                                    fontFamily: 'Arcade',
+                                                    fontSize: 20)));
+                                            i++;
+                                            if (i == 6) {
+                                              break;
+                                            }
                                           }
                                           return Column(children: listaColumn);
                                         } else if (snapshot.hasError) {
@@ -175,10 +191,57 @@ class _InfoPageState extends State<InfoPage> {
                                 SizedBox(height: 10),
                                 RaisedButton(
                                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => SwiperRutas()),
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible:
+                                          false, // user must tap button!
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Row(children: [
+                                            Text('Atencion'),
+                                            Icon(Icons.warning)
+                                          ]),
+                                          content: SingleChildScrollView(
+                                            child: ListBody(
+                                              children: <Widget>[
+                                                Text(
+                                                    'Estas seguro de que quieres salar de la partida?'),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                    'Perderas todo tu progreso.'),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                    'Selecciona una de las respuestas para continuar.'),
+                                              ],
+                                            ),
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Icon(Icons.check),
+                                              onPressed: () {
+                                                API.updateRutaUsuarioDes(
+                                                    rutaUsuario["id"]);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          SwiperRutas()),
+                                                );
+                                              },
+                                            ),
+                                            TextButton(
+                                              child: Icon(Icons.clear),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     );
                                   },
                                   textColor: Colors.white,

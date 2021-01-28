@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
-import 'package:geo_explorer/models/localizacion.dart';
+import 'package:geo_explorer/global/globals.dart';
 import 'package:geo_explorer/models/ruta.dart';
 import 'package:geo_explorer/pages/pageView.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
@@ -23,12 +23,30 @@ class _SwiperRutasState extends State<SwiperRutas> {
   @override
   void initState() {
     super.initState();
+    getUsuario();
   }
 
   Future<List> getData() async {
     return await API.getRutas().then((response) {
       return response;
     });
+  }
+
+  Future<Map> getRutausuario(var id) async {
+    return await API.getRutaUsuario(id).then((response) {
+      print(response);
+      return response;
+    });
+  }
+
+  Future<List> getGetUser(var nombre) async {
+    return await API.getUser(nombre).then((response) {
+      return response;
+    });
+  }
+
+  Future<void> getUsuario() async {
+    usuario = await getGetUser(usuarioNombre);
   }
 
   List<String> ciudades = [];
@@ -46,7 +64,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
           builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
             if (snapshot.hasData) {
               dropdownValue = snapshot.data[0]['ciudad'];
-              idRuta = snapshot.data[0]["_id"];
+              idRuta = snapshot.data[0]["id"];
               var esta = false;
               for (var ruta in snapshot.data) {
                 for (var ciudad in ciudades) {
@@ -88,7 +106,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
                 ),
                 Swiper(
                   onIndexChanged: (value) {
-                    idRuta = snapshot.data[value]["_id"];
+                    idRuta = snapshot.data[value]["id"];
                   },
                   layout: SwiperLayout.TINDER,
                   itemCount: snapshot.data.length,
@@ -156,8 +174,20 @@ class _SwiperRutasState extends State<SwiperRutas> {
                                     children: [
                                       FlatButton(
                                         color: Colors.blue[300],
-                                        onPressed: () {
+                                        onPressed: () async {
+                                          puntuacion = 0;
+
                                           /*****************INICIAR RUTA****************** */
+
+                                          Map data = {
+                                            "usuarioId": usuario[0]["id"],
+                                            "rutaId": idRuta,
+                                            "puntuacion": puntuacion,
+                                            "activo": true,
+                                          };
+
+                                          API.createRutaUsuario(data);
+
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -194,8 +224,10 @@ class _SwiperRutasState extends State<SwiperRutas> {
                   height: 15,
                 ),
                 FloatingActionButton.extended(
+                  label: Text("RANKING"),
                   onPressed: () {
-                    /*****************INICIAR RUTA****************** */
+                    /*****************ABRIR RANKING****************** */
+
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -203,7 +235,6 @@ class _SwiperRutasState extends State<SwiperRutas> {
                                   id: idRuta,
                                 )));
                   },
-                  label: Text("RANKING"),
                 ),
               ]);
             } else if (snapshot.hasError) {

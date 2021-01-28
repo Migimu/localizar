@@ -3,6 +3,8 @@ import 'package:geo_explorer/api/conexionApi.dart';
 
 import 'dart:convert';
 
+import 'package:geo_explorer/global/globals.dart';
+
 class LoginCorrect extends StatefulWidget {
   LoginCorrect({Key key, this.usuario}) : super(key: key);
   final usuario;
@@ -47,6 +49,7 @@ class _LoginCorrectState extends State<LoginCorrect> {
   obtenerUsuario() {
     API.getUser(widget.usuario).then((response) {
       dbUser = response[0];
+      usuario = response[0];
       setState(() {});
     });
   }
