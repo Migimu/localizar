@@ -18,6 +18,7 @@ class SwiperRutas extends StatefulWidget {
 
 class _SwiperRutasState extends State<SwiperRutas> {
   List listaRutas = [];
+  var idRuta;
 
   @override
   void initState() {
@@ -45,21 +46,9 @@ class _SwiperRutasState extends State<SwiperRutas> {
           builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
             if (snapshot.hasData) {
               dropdownValue = snapshot.data[0]['ciudad'];
-
+              idRuta = snapshot.data[0]["_id"];
               var esta = false;
               for (var ruta in snapshot.data) {
-                // ruta.idR = ruta["id"];
-                // ruta.setNombre(ruta["nombre"]);
-                // ruta.setId(ruta["ciudad"]);
-                // ruta.setId(ruta["tematica"]);
-                // ruta.setId(ruta["duracion"]);
-                // ruta.setId(ruta["descripcion"]);
-                // ruta.setId(ruta["transporte"]);
-                // ruta.setId(ruta["imagen"]);
-                // ruta.setId(ruta["dificultad"]);
-                // ruta.setId(ruta["listaLocalizaciones"]);
-                // rutas.setRutas(ruta);
-                //print(ruta['ciudad']);
                 for (var ciudad in ciudades) {
                   if (ciudad == ruta['ciudad']) {
                     esta = true;
@@ -98,6 +87,9 @@ class _SwiperRutasState extends State<SwiperRutas> {
                   }).toList(),
                 ),
                 Swiper(
+                  onIndexChanged: (value) {
+                    idRuta = snapshot.data[value]["_id"];
+                  },
                   layout: SwiperLayout.TINDER,
                   itemCount: snapshot.data.length,
                   itemBuilder: (context, index) {
@@ -173,6 +165,8 @@ class _SwiperRutasState extends State<SwiperRutas> {
                                                       localizacionesList: snapshot
                                                               .data[index][
                                                           'listaLocalizaciones'],
+                                                      rutaList:
+                                                          snapshot.data[index],
                                                     )),
                                           );
                                         },
@@ -202,8 +196,12 @@ class _SwiperRutasState extends State<SwiperRutas> {
                 FloatingActionButton.extended(
                   onPressed: () {
                     /*****************INICIAR RUTA****************** */
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Ranking()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Ranking(
+                                  id: idRuta,
+                                )));
                   },
                   label: Text("RANKING"),
                 ),

@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
 
 class Ranking extends StatefulWidget {
-  Ranking({Key key}) : super(key: key);
+  final id;
+  Ranking({Key key, @required this.id}) : super(key: key);
 
   @override
-  _RankingState createState() => _RankingState();
+  _RankingState createState() => _RankingState(id);
 }
 
 class _RankingState extends State<Ranking> {
+  var id;
+
+  _RankingState(var id) {
+    this.id = id;
+  }
+
   Future<List> getData(var id) async {
     return await API.getPuntuacion(id).then((response) {
       return response;
@@ -52,7 +59,7 @@ class _RankingState extends State<Ranking> {
         //width: 200,
         //height: 100,
         FutureBuilder<List>(
-            future: getData(0),
+            future: getData(id),
             builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
               if (snapshot.hasData) {
                 var pos;

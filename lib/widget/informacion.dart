@@ -1,180 +1,202 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geo_explorer/api/conexionApi.dart';
 import 'package:geo_explorer/widget/swiper.dart';
 
-class InfoPage extends StatelessWidget {
+class InfoPage extends StatefulWidget {
+  final rutaList;
+
+  InfoPage({Key key, @required this.rutaList}) : super(key: key);
+  @override
+  _InfoPageState createState() => _InfoPageState(rutaList);
+}
+
+class _InfoPageState extends State<InfoPage> {
+  var rutaList;
+  _InfoPageState(var rutaList) {
+    this.rutaList = rutaList;
+  }
+
+  List<Widget> _getLocalizaciones() {
+    var localizaciones = [
+      Text(
+        "LOCALIZACIONES",
+        style: TextStyle(
+          fontSize: 25,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      SizedBox(height: 10)
+    ];
+    for (var localizacion in rutaList["listaLocalizaciones"]) {
+      var json = jsonDecode(localizacion);
+      localizaciones.add(Text(json["nombre"]));
+    }
+    return localizaciones;
+  }
+
+  Future<List> _getUsuariosRanking() async {
+    return await API.getPuntuacion(rutaList["_id"]).then((response) {
+      return response;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(17, 75, 95, 1),
-      body: Stack(children: [
-        // Positioned(
-        //   top: 5,
-        //   left: 5,
-        //   child: Container(
-        //     child: Ink(
-        //       decoration: const ShapeDecoration(
-        //         color: Colors.grey,
-        //         shape: CircleBorder(),
-        //       ),
-        //       child: IconButton(
-        //         icon: Icon(Icons.arrow_back_ios),
-        //         color: Colors.white,
-        //         onPressed: () {
-        //           Navigator.pop(context);
-        //         },
-        //       ),
-        //     ),
-        //   ),
-        // ),
-        Positioned.fill(
-          top: 50,
-          child: Align(
-            child: SingleChildScrollView(
+        backgroundColor: Color.fromRGBO(17, 75, 95, 1),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              top: 50,
+              child: Align(
+                  child: SingleChildScrollView(
                 child: Column(
-                    //mainAxisAlignment: MainAxisAlignment.spaceEvenly, // mainAxisAlignment
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceAround, // mainAxisAlignment
                     children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.80, //80% de la pantalla
-                    //height: 100,
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(243, 233, 210, 1),
-                        border: Border.all(
-                          color: Color.fromRGBO(224, 214, 191, 1),
-                          width: 4,
-                        ),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "RUTA AAA",
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
+                      Container(
+                        width: MediaQuery.of(context).size.width *
+                            0.80, //80% de la pantalla
+                        //height: 100,
+                        decoration: BoxDecoration(
+                            color: Color.fromRGBO(243, 233, 210, 1),
+                            border: Border.all(
+                              color: Color.fromRGBO(224, 214, 191, 1),
+                              width: 4,
                             ),
-                          ),
-                          SizedBox(height: 10),
-                          Text(
-                              "Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas , las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum."),
-                        ]),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.80, //80% de la pantalla
-                    height: 500,
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(198, 218, 191, 1),
-                        border: Border.all(
-                          color: Color.fromRGBO(136, 212, 152, 1),
-                          width: 4,
-                        ),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "LOCALIZACIONES",
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 10),
-                          Stepper(steps: [
-                            Step(
-                                isActive: false,
-                                title: Text("Localizacion 1"),
-                                content: Icon(Icons.gps_fixed)),
-                            Step(
-                                isActive: true,
-                                title: Text("Localizacion 2"),
-                                content: Icon(Icons.gps_fixed)),
-                            Step(
-                                title: Text("Localizacion 3"),
-                                content: Icon(Icons.gps_fixed)),
-                            Step(
-                                title: Text("Localizacion 4"),
-                                content: Icon(Icons.gps_fixed))
-                          ])
-                        ]),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    width: MediaQuery.of(context).size.width *
-                        0.80, //80% de la pantalla
-                    //height: 100,
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(243, 233, 210, 1),
-                        border: Border.all(
-                          color: Color.fromRGBO(224, 214, 191, 1),
-                          width: 4,
-                        ),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                              decoration: new BoxDecoration(
-                                color: Color.fromRGBO(136, 212, 152, 0.51),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 5,
-                                    blurRadius: 5,
-                                    offset: Offset(
-                                        0, 4), // changes position of shadow
-                                  ),
-                                ],
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                rutaList["nombre"],
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              //width: 200,
-                              //height: 100,
-                              child: Center(
-                                child: Text('RANKING',
-                                    style: TextStyle(fontFamily: 'Arcade')),
-                              )),
-                          SizedBox(height: 10),
-                          Text('1ST AAAAA 1000',
-                              style: TextStyle(fontFamily: 'Arcade')),
-                          SizedBox(height: 10),
-                          Text('2ST BBBBB 900',
-                              style: TextStyle(fontFamily: 'Arcade')),
-                          SizedBox(height: 10),
-                          Text('3ST CCCC 700',
-                              style: TextStyle(fontFamily: 'Arcade')),
-                          SizedBox(height: 10),
-                          Text('4ST DDD 450',
-                              style: TextStyle(fontFamily: 'Arcade')),
-                          SizedBox(height: 10),
-                          Text('5ST EEE 250',
-                              style: TextStyle(fontFamily: 'Arcade')),
-                        ]),
-                  ),
-                  SizedBox(height: 10),
-                  RaisedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SwiperRutas()),
-                      );
-                    },
-                    textColor: Colors.white,
-                    padding: const EdgeInsets.all(1.0),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: Color.fromRGBO(26, 147, 111, 1),
+                              SizedBox(height: 10),
+                              Text(rutaList["descripcion"]),
+                              SizedBox(height: 10),
+                            ]),
                       ),
-                      padding: const EdgeInsets.all(10.0),
-                      child: Text('FINALIZAR PARTIDA',
-                          style: TextStyle(fontFamily: 'Arcade')),
-                    ),
-                  )
-                ])),
-          ),
-        ),
-      ]),
-    );
+                      SizedBox(height: 10),
+                      Container(
+                        width: MediaQuery.of(context).size.width *
+                            0.80, //80% de la pantalla
+                        height: MediaQuery.of(context).size.width * 0.50,
+                        decoration: BoxDecoration(
+                            color: Color.fromRGBO(198, 218, 191, 1),
+                            border: Border.all(
+                              color: Color.fromRGBO(136, 212, 152, 1),
+                              width: 4,
+                            ),
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: _getLocalizaciones()),
+                      ),
+                      SizedBox(height: 10),
+                      Container(
+                          width: MediaQuery.of(context).size.width *
+                              0.80, //80% de la pantalla
+                          //height: 100,
+                          decoration: BoxDecoration(
+                              color: Color.fromRGBO(243, 233, 210, 1),
+                              border: Border.all(
+                                color: Color.fromRGBO(224, 214, 191, 1),
+                                width: 4,
+                              ),
+                              borderRadius: BorderRadius.circular(12)),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  decoration: new BoxDecoration(
+                                    color: Color.fromRGBO(136, 212, 152, 0.51),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 5,
+                                        offset: Offset(
+                                            0, 4), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  //width: 200,
+                                  //height: 100,
+                                  child: FutureBuilder<List>(
+                                      future: _getUsuariosRanking(),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<dynamic> snapshot) {
+                                        var listaColumn = <Widget>[
+                                          Center(
+                                            child: Text('RANKING',
+                                                style: TextStyle(
+                                                    fontFamily: 'Arcade')),
+                                          )
+                                        ];
+
+                                        if (snapshot.hasData) {
+                                          for (var usuario in snapshot.data) {
+                                            listaColumn
+                                                .add(SizedBox(height: 10));
+                                            listaColumn.add(Text(
+                                                '1ST AAAAA ${usuario["puntuacion"]}',
+                                                style: TextStyle(
+                                                    fontFamily: 'Arcade')));
+                                          }
+                                          return Column(children: listaColumn);
+                                        } else if (snapshot.hasError) {
+                                          return Column(children: [
+                                            Icon(
+                                              Icons.error_outline,
+                                              color: Colors.red,
+                                              size: 60,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 16),
+                                              child: Text(
+                                                  'Error: ${snapshot.error}'),
+                                            )
+                                          ]);
+                                        } else {
+                                          return Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        }
+                                      }),
+                                ),
+                                SizedBox(height: 10),
+                                RaisedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => SwiperRutas()),
+                                    );
+                                  },
+                                  textColor: Colors.white,
+                                  padding: const EdgeInsets.all(1.0),
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Color.fromRGBO(26, 147, 111, 1),
+                                    ),
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Text('FINALIZAR PARTIDA',
+                                        style: TextStyle(fontFamily: 'Arcade')),
+                                  ),
+                                )
+                              ])),
+                    ]),
+              )),
+            )
+          ],
+        ));
   }
 }

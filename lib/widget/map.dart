@@ -113,6 +113,7 @@ class _MapaState extends State<Mapa> {
               onTap: () async {
                 for (var localizacion in localizaciones) {
                   var json = jsonDecode(localizacion);
+                  print(circulo.center);
                   print(json['latitud']);
                   print(circulo.center.latitude);
                   print(json['longitud']);
@@ -179,12 +180,8 @@ class _MapaState extends State<Mapa> {
             radius: 200,
             visible: true));
       });
-      _puntos.add(LatLng(json["latitud"], json["longitud"]));
       cont++;
     }
-    /*_puntos.add(LatLng(43.321613861083984, -2.006986047744751));
-    _puntos.add(LatLng(43.329613861083984, -2.016986047744751));
-    _puntos.add(LatLng(43.325613861083984, -2.000986047744751));*/
     setState(() {
       _polylines.add(Polyline(
           polylineId: PolylineId("$cont"),
