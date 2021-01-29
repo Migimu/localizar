@@ -206,13 +206,21 @@ class _MapaState extends State<Mapa> {
 
   @override
   Widget build(BuildContext context) {
+    // print(usuario);
+    // var json = jsonDecode(usuario);
+    // print(json);
+    var imagen64 = base64.decode(usuario[0]["avatar"]);
+
+    var imagenValida = Image.memory(
+      imagen64,
+      width: 100.0,
+      height: 200.0,
+    );
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         actions: [
-          Icon(
-            Icons.perm_identity,
-          ),
+          imagenValida,
           SizedBox(
             width: 20,
           )
