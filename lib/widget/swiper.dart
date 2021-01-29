@@ -49,8 +49,8 @@ class _SwiperRutasState extends State<SwiperRutas> {
     usuario = await getGetUser(usuarioNombre);
   }
 
-  List<String> ciudades = [];
-  var dropdownValue;
+  List<String> ciudades = ["TODOS"];
+  var dropdownValue = "TODOS";
   @override
   Widget build(BuildContext context) {
     final ruta = Provider.of<Ruta>(context);
@@ -63,10 +63,10 @@ class _SwiperRutasState extends State<SwiperRutas> {
           future: getData(),
           builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
             if (snapshot.hasData) {
-              dropdownValue = snapshot.data[0]['ciudad'];
               idRuta = snapshot.data[0]["id"];
-              var esta = false;
+
               for (var ruta in snapshot.data) {
+                var esta = false;
                 for (var ciudad in ciudades) {
                   if (ciudad == ruta['ciudad']) {
                     esta = true;
@@ -77,6 +77,13 @@ class _SwiperRutasState extends State<SwiperRutas> {
                 }
               }
 
+              var itemLista =
+                  ciudades.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList();
               return Column(children: <Widget>[
                 SizedBox(
                   height: 10,
@@ -97,12 +104,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
                       dropdownValue = newValue;
                     });
                   },
-                  items: ciudades.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+                  items: itemLista,
                 ),
                 Swiper(
                   onIndexChanged: (value) {
