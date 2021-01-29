@@ -223,6 +223,7 @@ class _InfoPageState extends State<InfoPage> {
                                             TextButton(
                                               child: Icon(Icons.check),
                                               onPressed: () {
+                                                mensajes = [];
                                                 API.updateRutaUsuarioDes(
                                                     rutaUsuario["id"]);
                                                 Navigator.push(

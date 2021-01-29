@@ -26,6 +26,7 @@ class _MapaState extends State<Mapa> {
   BitmapDescriptor pinAnswered;
   bool seguir = false;
   int contRespondido = 0;
+  var imagen64 = base64.decode(usuario[0]["avatar"]);
 
   _MapaState(List localizaciones) {
     this.localizaciones = localizaciones;
@@ -200,6 +201,7 @@ class _MapaState extends State<Mapa> {
       _polylines.add(Polyline(
           polylineId: PolylineId("$cont"),
           points: _puntos,
+          width: 7,
           color: Colors.green));
     });
   }
@@ -209,7 +211,6 @@ class _MapaState extends State<Mapa> {
     // print(usuario);
     // var json = jsonDecode(usuario);
     // print(json);
-    var imagen64 = base64.decode(usuario[0]["avatar"]);
 
     var imagenValida = Image.memory(
       imagen64,
@@ -225,7 +226,10 @@ class _MapaState extends State<Mapa> {
             width: 20,
           )
         ],
-        title: Text("NOMBRE DE RUTA"),
+        title: Text(
+          rutaName,
+          style: TextStyle(fontFamily: 'Arcade'),
+        ),
       ),
       body: Stack(
         children: <Widget>[

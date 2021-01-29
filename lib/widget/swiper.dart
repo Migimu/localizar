@@ -64,7 +64,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
           builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
             if (snapshot.hasData) {
               idRuta = snapshot.data[0]["id"];
-
+              rutaName = snapshot.data[0]["nombre"];
               for (var ruta in snapshot.data) {
                 var esta = false;
                 for (var ciudad in ciudades) {

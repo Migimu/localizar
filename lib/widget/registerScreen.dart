@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:geo_explorer/api/conexionApi.dart';
 import 'package:geo_explorer/widget/loginScreen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:geo_explorer/api/conexionApi.dart';
 
 import 'dart:convert';
 
@@ -15,6 +15,15 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  var lista;
+
+  @override
+  void initState() {
+    API.getUsers().then((response) {
+      lista = response;
+    });
+  }
+
   /* CONSTANTES */
   final kHintTextStyle = TextStyle(
     color: Colors.white54,
@@ -396,6 +405,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: RaisedButton(
         elevation: 5.0,
         onPressed: () {
+          var existe = false;
+          for (var user in lista) {
+            if (user['usuario'] == controllerUsuario.text) {
+              existe = true;
+              break;
+            }
+          }
           if (controllerUsuario.text == "" ||
               controllerContrasena.text == "" ||
               controllerContrasenaRepetida.text == "" ||
@@ -406,6 +422,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           } else if (controllerContrasena.text !=
               controllerContrasenaRepetida.text) {
             controllerErrores.text = "Las contraseñas no coinciden";
+            esVisible = true;
+          } else if (existe) {
+            controllerErrores.text = "El usuario ya existe.";
             esVisible = true;
           } else {
             esVisible = false;
