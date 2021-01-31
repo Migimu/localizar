@@ -6,20 +6,24 @@ import 'dart:convert';
 const baseUrl =
     "http://10.0.2.2:8080"; //10.0.2.2 porque estas en un emulador de android
 
+//LLAMDA A API PARA CONSEGUIR LAS RUTAS
+
 class API {
   static Future getRutas() async {
-    var url = baseUrl + "/rutas/leer";
+    var url = baseUrl + "/rutas/getAll";
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var responseJson = json.decode(response.body);
+
       return responseJson;
     } else {
       return null;
     }
   }
 
+//LLAMDA A API PARA CONSEGUIR LAS LOCALIZACIONES
   static Future getLocalizacion(var id) async {
-    var url = baseUrl + "/localizaciones/porId/$id";
+    var url = baseUrl + "/localizaciones/getId/$id";
 
     final response = await http.get(url);
     if (response.statusCode == 200) {
@@ -30,8 +34,9 @@ class API {
     }
   }
 
+//LLAMDA A API PARA CONSEGUIR LOS USUARIOS
   static Future getUsers() async {
-    var url = baseUrl + "/usuarios/all";
+    var url = baseUrl + "/usuarios/getAll";
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var responseJson = json.decode(response.body);
@@ -41,8 +46,9 @@ class API {
     }
   }
 
+//LLAMDA A API PARA CREAR USUARIO
   static Future createUser(var data) async {
-    var url = baseUrl + "/usuarios/new";
+    var url = baseUrl + "/usuarios/add";
 
     var body = json.encode(data);
 
@@ -55,8 +61,9 @@ class API {
     print("Funcion de crear usuario");
   }
 
+//LLAMDA A API PARA CONSEGUIR USUARIO POR NOMBRE DE USUARIO
   static Future getUser(var user) async {
-    var url = baseUrl + "/usuarios/getByUsuario/$user";
+    var url = baseUrl + "/usuarios/getUsuario/$user";
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var responseJson = json.decode(response.body);
@@ -66,6 +73,7 @@ class API {
     }
   }
 
+//LLAMDA A API PARA CONSEGUIR LA PUNTUACION DE UNA RUTA
   static Future getPuntuacion(var id) async {
     var url = baseUrl + "/rutaUsuario/getAllByRutaId/$id";
     final response = await http.get(url);
@@ -77,8 +85,9 @@ class API {
     }
   }
 
+//LLAMDA A API PARA CREAR UNA NUEVA PARTIDA
   static Future createRutaUsuario(var data) async {
-    var url = baseUrl + "/rutaUsuario/new";
+    var url = baseUrl + "/rutaUsuario/add";
     var body = json.encode(data);
 
     var response = await http.post(url,
@@ -87,6 +96,7 @@ class API {
     rutaUsuario = jsonDecode(response.body);
   }
 
+//LLAMDA A API PARA CONSEGUIR UNA PARTIDA EN CONCRETO
   static Future getRutaUsuario(var id) async {
     var url = baseUrl + "/rutaUsuario/getAllByUsuarioId/$id";
     final response = await http.get(url);
@@ -98,14 +108,16 @@ class API {
     }
   }
 
-  /*static Future updateRutaUsuario(var id) async {
-    var url = baseUrl + "/rutaUsuario/rutaUsuarioActivar/$id";
+//LLAMDA A API PARA MODIFICAR EL ESTADO DE LA PARTIDA
+  static Future updateRutaUsuarioDes(var id) async {
+    var url = baseUrl + "/rutaUsuario/editRutaUsuarioDesactivar/$id";
 
     await http.put(url);
-  }*/
+  }
 
-  static Future updateRutaUsuarioDes(var id) async {
-    var url = baseUrl + "/rutaUsuario/rutaUsuarioDesactivar/$id";
+//LLAMDA A API PARA MODIFICAR LA PUNTUACION DE LA PARTIDA
+  static Future updatePuntuacion(var id, var puntuacion) async {
+    var url = baseUrl + "/rutaUsuario/editPuntuacion/$id/$puntuacion";
 
     await http.put(url);
   }

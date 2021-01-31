@@ -3,8 +3,11 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:geo_explorer/api/conexionApi.dart';
 import 'package:geo_explorer/global/globals.dart';
 import 'package:geo_explorer/widget/dialog.dart';
+import 'package:geo_explorer/widget/ranking.dart';
+import 'package:geo_explorer/widget/swiper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 //import 'package:permission_handler/permission_handler.dart';
@@ -25,8 +28,7 @@ class _MapaState extends State<Mapa> {
   BitmapDescriptor pinLocationIcon;
   BitmapDescriptor pinAnswered;
   bool seguir = false;
-  int contRespondido = 0;
-  var imagen64 = base64.decode(usuario[0]["avatar"]);
+  var imagenValida;
 
   _MapaState(List localizaciones) {
     this.localizaciones = localizaciones;
@@ -51,7 +53,23 @@ class _MapaState extends State<Mapa> {
     _setCircles();
     _goToTheUser();
     _distanceFromCircle();
+    //AVATAR SI TIENE UNA IMAGEN VALIDA
+
+    if (usuario[0]["avatar"] == "" || usuario[0]["avatar"] == null) {
+      imagenValida = Image(
+        image: AssetImage("images/explorer.png"),
+        width: 100.0,
+        height: 200.0,
+      );
+    } else {
+      imagenValida = Image.memory(
+        base64.decode(usuario[0]["avatar"]),
+        width: 100.0,
+        height: 200.0,
+      );
+    }
   }
+  //OBTENER POSICION ACTUAL
 
   Future<Position> _getCurrentLocation() async {
     return Future(() {
@@ -59,6 +77,8 @@ class _MapaState extends State<Mapa> {
           desiredAccuracy: LocationAccuracy.bestForNavigation);
     });
   }
+
+  //CAMARA VA A EL USUARIO
 
   Future<void> _goToTheUser() async {
     _currentPosition = await _getCurrentLocation();
@@ -72,6 +92,8 @@ class _MapaState extends State<Mapa> {
     controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
+  //CAMARA SIGUE A EL USUARIO
+
   Future<void> _followUser() async {
     while (seguir) {
       _currentPosition = await _getCurrentLocation();
@@ -84,6 +106,8 @@ class _MapaState extends State<Mapa> {
       controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
     }
   }
+
+  //CALCULA LAS DISTANCIAS DESDE LOS PUNTOS MAS CARCANOS
 
   Future<void> _distanceFromCircle() async {
     _currentPosition = await _getCurrentLocation();
@@ -103,76 +127,152 @@ class _MapaState extends State<Mapa> {
       pinAnswered = await BitmapDescriptor.fromAssetImage(
           ImageConfiguration(devicePixelRatio: 5), 'images/comprobar.png');
 
-      if (distancia < 200) {
+      if (distancia < 50) {
         setState(() {
           _isVisible = true;
-          //print(localizaciones.length);
+          //SI ESTA DENTRO DEL CICULO SE MUSTRA EL ICONO
 
           _markers.add(Marker(
               markerId: MarkerId("$cont"),
               position: circulo.center,
               consumeTapEvents: false,
               icon: pinLocationIcon,
+              zIndex: 1,
               onTap: () async {
+                print(cont);
                 for (var localizacion in localizaciones) {
-                  var json = jsonDecode(localizacion);
-                  print(circulo.center);
-                  print(json['latitud']);
-                  print(circulo.center.latitude);
-                  print(json['longitud']);
-                  print(circulo.center.longitude);
-                  if (json['latitud'] ==
-                          circulo.center
-                              .latitude /*&&
-                      json['longitud'] == circulo.center.longitude*/
-                      ) {
+                  //var json = jsonDecode(localizacion);
+                  print(circulo.center.latitude == localizacion['latitud']);
+                  print(circulo.center.latitude == localizacion['longitud']);
+                  print(localizacion['latitud']);
+                  if (localizacion['latitud'] == circulo.center.latitude ||
+                      localizacion['longitud'] == circulo.center.longitude) {
+                    print("object");
+
+                    // MUESTRA LA PESTAÑA CON LA PREGUNTA
                     var respuesta = await showDialog(
                         barrierColor: Colors.green,
                         barrierDismissible: false,
                         child: Dialog(
                             child: Pregunta(
-                          pregunta: json['pregunta'],
+                          pregunta: localizacion['pregunta'],
                         )),
                         context: context);
 
-                    for (var marker in _markers) {
-                      if (marker.markerId == MarkerId("${cont - 1}")) {
-                        _markers.add(Marker(
-                            markerId: MarkerId("$cont"),
-                            position: circulo.center,
-                            consumeTapEvents: false,
-                            icon: pinAnswered,
-                            zIndex: 5,
-                            onTap: () {}));
-                        break;
-                      }
-                    }
+                    //AÑADE NUEVO MARKER INDICANDO QUE SE HA RESPONDIDIO A LA RESPUESTA
+                    print(_markers.add(Marker(
+                        markerId: MarkerId("$cont"),
+                        position: circulo.center,
+                        consumeTapEvents: false,
+                        icon: pinAnswered,
+                        zIndex: 5,
+                        onTap: () {})));
+
+//BORRA EL PRIMER MARKER
+                    _markers
+                        .retainWhere((element) => element.icon == pinAnswered);
                     if (respuesta) {
                       puntuacion = puntuacion + 10;
                     }
+                    //CONTADOR PREGUNTAS RESPONDIDADAS
                     contRespondido++;
+                    //SI EL CONTADOR PREGUNTAS RESPONDIDADAS ES IGUAL AL NUMERO DE LOCALIZACIONES EL JUEGO TERMINA
                     if (contRespondido == _circles.length) {
                       //FINALIZAR JUEGO
+                      //PESTAÑA FIN DE JUEGO
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false, // user must tap button!
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Row(children: [
+                              Text('Enhorabuena'),
+                              Icon(Icons.celebration)
+                            ]),
+                            content: SingleChildScrollView(
+                              child: ListBody(
+                                children: <Widget>[
+                                  Text('Has finalizado la ruta'),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text('Tu puntuacion ha sido: $puntuacion'),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                      'Si quieres ver tu puesto en el raking selecciona el icono de la derecha si no volveras a la pestaña de rutas'),
+                                ],
+                              ),
+                            ),
+                            actions: <Widget>[
+                              //BOTON IZQUIERDA
+                              TextButton(
+                                child: Icon(Icons.list_alt),
+                                onPressed: () {
+                                  //VACIA CHAT
+                                  mensajes = [];
+                                  //DEJA DE JUGAR
+                                  jugando = false;
+                                  //ACTUALIZA LA PUTUACION DEL JUGADOR Y MUSTRA EL RANKING
+                                  API.updatePuntuacion(
+                                      rutaUsuario["id"], puntuacion);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Ranking(
+                                              id: idRuta,
+                                            )),
+                                  );
+                                },
+                              ),
+                              //BOTON DERECHA
+                              TextButton(
+                                child: Icon(Icons.clear),
+                                onPressed: () {
+                                  //VACIA CHAT
+                                  mensajes = [];
+                                  //DEJA DE JUGAR
+                                  jugando = false;
+                                  //ACTUALIZA LA PUTUACION DEL JUGADOR Y MUSTRA LAS RUTAS
+                                  API.updatePuntuacion(
+                                      rutaUsuario["id"], puntuacion);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SwiperRutas()),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                       print("has terminado");
                     }
                   }
+                  cont++;
                 }
               }));
         });
-        cont++;
+
         break;
       } else {
+        //SI TE ALEJAS DEL CICULO SE OCULTA EL ICONO A NO SER QUE SE HALLA RESPONDIDIO
         setState(() {
           _isVisible = false;
-
+          _markers.retainWhere((element) => element.icon == pinAnswered);
           _markers.removeWhere((item) => item.icon == pinLocationIcon);
         });
       }
     }
-
-    _distanceFromCircle();
+//SI SE DEJA DE JUGAR DEJA DE BUSCAR LA LOCALIZACION MAS CERCANA
+    if (jugando) {
+      _distanceFromCircle();
+    }
   }
 
+//CAMBIA LA APARIENCIA DEL MAPA
   void _changeMapType() {
     setState(() {
       _defaultMapType = _defaultMapType == MapType.normal
@@ -181,19 +281,21 @@ class _MapaState extends State<Mapa> {
     });
   }
 
+  //MUESTRA LOS CICULOS EN EL MAPA Y LAS LINEAS
+
   void _setCircles() {
     var cont = 0;
     List<LatLng> _puntos = [];
     for (var localizacion in localizaciones) {
-      var json = jsonDecode(localizacion);
+      //var json = jsonDecode(localizacion);
       setState(() {
         _circles.add(Circle(
             circleId: CircleId("$cont"),
-            center: LatLng(json["latitud"], json["longitud"]),
-            radius: 200,
+            center: LatLng(localizacion["latitud"], localizacion["longitud"]),
+            radius: 50,
             zIndex: 0,
             visible: true));
-        _puntos.add(LatLng(json["latitud"], json["longitud"]));
+        _puntos.add(LatLng(localizacion["latitud"], localizacion["longitud"]));
       });
       cont++;
     }
@@ -208,15 +310,6 @@ class _MapaState extends State<Mapa> {
 
   @override
   Widget build(BuildContext context) {
-    // print(usuario);
-    // var json = jsonDecode(usuario);
-    // print(json);
-
-    var imagenValida = Image.memory(
-      imagen64,
-      width: 100.0,
-      height: 200.0,
-    );
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -234,6 +327,7 @@ class _MapaState extends State<Mapa> {
       body: Stack(
         children: <Widget>[
           Container(
+            //WIDGET MAPA
             child: GoogleMap(
               myLocationEnabled: true,
               onMapCreated: _onMapCreated,
@@ -254,6 +348,7 @@ class _MapaState extends State<Mapa> {
             margin: EdgeInsets.only(top: 20, right: 10),
             alignment: Alignment.topRight,
             child: Column(children: <Widget>[
+              //BOTON CAMBIAR APARIENCIA MAPA
               FloatingActionButton(
                   heroTag: 'map',
                   child: Icon(Icons.layers),
@@ -265,6 +360,7 @@ class _MapaState extends State<Mapa> {
               SizedBox(
                 height: 10,
               ),
+              //BOTON PARA SEGUIR A EL USUARIO
               FloatingActionButton(
                   heroTag: 'follow',
                   child: Icon(Icons.my_location),
@@ -280,6 +376,7 @@ class _MapaState extends State<Mapa> {
                   }),
             ]),
           ),
+          //TEXTO DE LO HAS ENCONTRADO
           Visibility(
               visible: _isVisible,
               child:
@@ -288,7 +385,7 @@ class _MapaState extends State<Mapa> {
                   Container(
                     child: Center(
                         child: Text(
-                      "Lo has logrado!",
+                      "Lo has encontrado!",
                       style: TextStyle(fontFamily: 'Arcade'),
                     )),
                     height: 100,

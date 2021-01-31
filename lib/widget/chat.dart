@@ -14,31 +14,26 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    var imagen64 = base64.decode(usuario[0]["avatar"]);
-
-    var avatar = Image.memory(
-      imagen64,
-      width: 100.0,
-      height: 200.0,
-    );
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
           title: Text("Chat"),
         ),
+        //WIDGET CHAT
         body: DashChat(
+          //USUARIO DEL CHAT
           user: ChatUser(
             name: usuario[0]["usuario"],
             uid: usuario[0]["usuario"],
           ),
           messages: mensajes,
           onSend: (ChatMessage) {
+            //AL ENVIAR MENSAJE SE ENVIA EL MENSAJE A EL CHAT
             mensajes.add(ChatMessage);
             var chatMsg = Map();
 

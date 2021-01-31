@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     API.getUsers().then((response) {
       lista = response;
+      listaUsuarios = response;
     });
     super.initState();
   }

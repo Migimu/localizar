@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
 import 'package:geo_explorer/global/globals.dart';
 import 'package:geo_explorer/widget/swiper.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class InfoPage extends StatefulWidget {
   final rutaList;
@@ -20,8 +21,18 @@ class _InfoPageState extends State<InfoPage> {
     this.rutaList = rutaList;
   }
 
+// LOCALIZACIONES EN AL MAPA Y INDICADOR DE PROGRESO
   List<Widget> _getLocalizaciones() {
     var localizaciones = [
+      LinearPercentIndicator(
+        center:
+            Text("$contRespondido/${rutaList["listaLocalizaciones"].length}"),
+        lineHeight: 30,
+        percent: contRespondido / rutaList["listaLocalizaciones"].length,
+      ),
+      SizedBox(
+        height: 10,
+      ),
       Text(
         "LOCALIZACIONES",
         style: TextStyle(
@@ -32,11 +43,12 @@ class _InfoPageState extends State<InfoPage> {
       SizedBox(height: 10)
     ];
     for (var localizacion in rutaList["listaLocalizaciones"]) {
-      var json = jsonDecode(localizacion);
-      localizaciones.add(Text(json["nombre"]));
+      //var json = jsonDecode(localizacion);
+      localizaciones.add(Text(localizacion["nombre"]));
     }
     return localizaciones;
   }
+  //LLAMDA A LA API PARA OBTENER LAS PUNTUACIONES
 
   Future<List> _getUsuariosRanking() async {
     return await API.getPuntuacion(rutaList["id"]).then((response) {
@@ -58,6 +70,7 @@ class _InfoPageState extends State<InfoPage> {
                     mainAxisAlignment:
                         MainAxisAlignment.spaceAround, // mainAxisAlignment
                     children: [
+                      //NOMBRE Y DESCRIPCION DE LA RUTA
                       Container(
                         width: MediaQuery.of(context).size.width *
                             0.80, //80% de la pantalla
@@ -85,6 +98,7 @@ class _InfoPageState extends State<InfoPage> {
                             ]),
                       ),
                       SizedBox(height: 10),
+                      // LOCALIZACIONES EN AL MAPA Y INDICADOR DE PROGRESO
                       Container(
                         width: MediaQuery.of(context).size.width *
                             0.80, //80% de la pantalla
@@ -101,6 +115,7 @@ class _InfoPageState extends State<InfoPage> {
                             children: _getLocalizaciones()),
                       ),
                       SizedBox(height: 10),
+                      //RANKING SIMPLIFICADO
                       Container(
                           width: MediaQuery.of(context).size.width *
                               0.80, //80% de la pantalla
@@ -128,8 +143,6 @@ class _InfoPageState extends State<InfoPage> {
                                       ),
                                     ],
                                   ),
-                                  //width: 200,
-                                  //height: 100,
                                   child: FutureBuilder<List>(
                                       future: _getUsuariosRanking(),
                                       builder: (BuildContext context,
@@ -143,8 +156,16 @@ class _InfoPageState extends State<InfoPage> {
                                         ];
                                         var i = 1;
                                         var pos;
+                                        var username = "Anonimo";
                                         if (snapshot.hasData) {
                                           for (var usuario in snapshot.data) {
+                                            for (var user in listaUsuarios) {
+                                              if (user["id"] ==
+                                                  usuario["usuarioId"]) {
+                                                username = user["usuario"];
+                                                break;
+                                              }
+                                            }
                                             if (i == 1) {
                                               pos = "1ST";
                                             } else if (i == 2) {
@@ -157,7 +178,7 @@ class _InfoPageState extends State<InfoPage> {
                                             listaColumn
                                                 .add(SizedBox(height: 10));
                                             listaColumn.add(Text(
-                                                '$pos ${usuario["usuario"]} ${usuario["puntuacion"]}',
+                                                '$pos $username ${usuario["puntuacion"]}',
                                                 style: TextStyle(
                                                     fontFamily: 'Arcade',
                                                     fontSize: 20)));
@@ -189,6 +210,7 @@ class _InfoPageState extends State<InfoPage> {
                                       }),
                                 ),
                                 SizedBox(height: 10),
+                                //BOTON DE FINALIZAR PARTIDA
                                 RaisedButton(
                                   onPressed: () {
                                     showDialog(
@@ -196,6 +218,7 @@ class _InfoPageState extends State<InfoPage> {
                                       barrierDismissible:
                                           false, // user must tap button!
                                       builder: (BuildContext context) {
+                                        //PESTAÑA DE ADVERTENCIA PARA SALIR DE LA RUTA
                                         return AlertDialog(
                                           title: Row(children: [
                                             Text('Atencion'),
@@ -219,11 +242,17 @@ class _InfoPageState extends State<InfoPage> {
                                               ],
                                             ),
                                           ),
+                                          //BOTON IZQUIERDA PESTAÑA SALIR
                                           actions: <Widget>[
                                             TextButton(
                                               child: Icon(Icons.check),
                                               onPressed: () {
+                                                //VACIAMOS CHAT
                                                 mensajes = [];
+                                                //DEJAMOS DE JUGAR
+                                                jugando = false;
+                                                //SALIMOS DE LA PARTIDA
+
                                                 API.updateRutaUsuarioDes(
                                                     rutaUsuario["id"]);
                                                 Navigator.push(
@@ -234,9 +263,11 @@ class _InfoPageState extends State<InfoPage> {
                                                 );
                                               },
                                             ),
+                                            //BOTON DERECHA PESTAÑA SALIR
                                             TextButton(
                                               child: Icon(Icons.clear),
                                               onPressed: () {
+                                                //CERRAMOS PESTAÑA
                                                 Navigator.of(context).pop();
                                               },
                                             ),
