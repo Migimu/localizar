@@ -20,6 +20,11 @@ class Pages extends StatefulWidget {
   _PagesState createState() => _PagesState(localizacionesList, rutaList);
 }
 
+@override
+void onBackPressed() {
+  print("object");
+}
+
 class _PagesState extends State<Pages> {
   var localizacionesList = [];
   var rutaList;
@@ -99,19 +104,22 @@ class _PagesState extends State<Pages> {
   @override
   Widget build(BuildContext context) {
     print(rutaList);
-    return PageView(
-      children: <Widget>[
-        //PAGINA INFORMACION
-        InfoPage(
-          rutaList: rutaList,
-        ),
-        //MAPA
-        Mapa(
-          localizaciones: localizacionesList,
-        ),
-        //CHAT
-        Chat(),
-      ],
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: PageView(
+        children: <Widget>[
+          //PAGINA INFORMACION
+          InfoPage(
+            rutaList: rutaList,
+          ),
+          //MAPA
+          Mapa(
+            localizaciones: localizacionesList,
+          ),
+          //CHAT
+          Chat(),
+        ],
+      ),
     );
   }
 }

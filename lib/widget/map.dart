@@ -53,6 +53,7 @@ class _MapaState extends State<Mapa> {
     _setCircles();
     _goToTheUser();
     _distanceFromCircle();
+    _updatePosition();
     //AVATAR SI TIENE UNA IMAGEN VALIDA
 
     if (usuario[0]["avatar"] == "" || usuario[0]["avatar"] == null) {
@@ -105,6 +106,14 @@ class _MapaState extends State<Mapa> {
       final GoogleMapController controller = await _controller.future;
       controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
     }
+  }
+
+//ACTUALIZA LA POSCION DEL USUARIO
+  Future<void> _updatePosition() async {
+    _currentPosition = await _getCurrentLocation();
+    API.updatePosicion(rutaUsuario["id"], _currentPosition.latitude,
+        _currentPosition.longitude);
+    Future.delayed(Duration(seconds: 10), _updatePosition);
   }
 
   //CALCULA LAS DISTANCIAS DESDE LOS PUNTOS MAS CARCANOS

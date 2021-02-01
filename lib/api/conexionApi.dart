@@ -121,4 +121,11 @@ class API {
 
     await http.put(url);
   }
+
+  //LLAMDA A API PARA MODIFICAR LA POSICION DEL USUARIO
+  static Future updatePosicion(var id, var lat, var lng) async {
+    var url = baseUrl + "/rutaUsuario/editRutaPosicion/$id/$lat/$lng";
+
+    await http.put(url);
+  }
 }

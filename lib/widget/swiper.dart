@@ -18,6 +18,7 @@ class SwiperRutas extends StatefulWidget {
 
 class _SwiperRutasState extends State<SwiperRutas> {
   List listaRutas = [];
+  int longitudSwiper = 0;
 
   @override
   void initState() {
@@ -64,98 +65,108 @@ class _SwiperRutasState extends State<SwiperRutas> {
 
     final rutas = Provider.of<Rutas>(context);
 
-    return Container(
-        child: Scaffold(
-      // SE PIDE LA INFORMACION A LA API Y MENDIATE EL FUTURE BUILDER SE GETIONA
-      body: FutureBuilder<List>(
-          future: getData(),
-          builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-            //SI HAY DATOS
-            if (snapshot.hasData) {
-              print(snapshot.data);
-              //LISTA DE CIUDADES PARA EL BOTON DROPDOWN
-              idRuta = snapshot.data[0]["id"];
-              rutaName = snapshot.data[0]["nombre"];
-              for (var ruta in snapshot.data) {
-                var esta = false;
-                for (var ciudad in ciudades) {
-                  if (ciudad == ruta['ciudad']) {
-                    esta = true;
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Container(
+          child: Scaffold(
+        // SE PIDE LA INFORMACION A LA API Y MENDIATE EL FUTURE BUILDER SE GETIONA
+        body: FutureBuilder<List>(
+            future: getData(),
+            builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+              //SI HAY DATOS
+              if (snapshot.hasData) {
+                if (dropdownValue == "TODOS") {
+                  longitudSwiper = snapshot.data.length;
+                } else {
+                  snapshot.data.retainWhere(
+                      (element) => element["ciudad"] == dropdownValue);
+                  longitudSwiper = snapshot.data.length;
+                }
+
+                print(snapshot.data);
+                //LISTA DE CIUDADES PARA EL BOTON DROPDOWN
+                idRuta = snapshot.data[0]["id"];
+                rutaName = snapshot.data[0]["nombre"];
+                for (var ruta in snapshot.data) {
+                  var esta = false;
+                  for (var ciudad in ciudades) {
+                    if (ciudad == ruta['ciudad']) {
+                      esta = true;
+                    }
+                  }
+                  if (!esta) {
+                    ciudades.add(ruta['ciudad']);
                   }
                 }
-                if (!esta) {
-                  ciudades.add(ruta['ciudad']);
-                }
-              }
-              //AQUI SE AÑADEN LA CIUDADES
-              var itemLista =
-                  ciudades.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList();
+                //AQUI SE AÑADEN LA CIUDADES
+                var itemLista =
+                    ciudades.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList();
 
-              //VISTA ELEGIR RUTAS
-              return Column(children: <Widget>[
-                SizedBox(
-                  height: 10,
-                ),
-                //BOTON DROPDOWN
-                DropdownButton<String>(
-                  value: dropdownValue,
-                  icon: Icon(Icons.arrow_downward),
-                  iconSize: 24,
-                  elevation: 16,
-                  style: TextStyle(color: Colors.deepPurple),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.deepPurpleAccent,
+                //VISTA ELEGIR RUTAS
+                return Column(children: <Widget>[
+                  SizedBox(
+                    height: 10,
                   ),
-                  onChanged: (String newValue) {
-                    print(newValue);
-                    setState(() {
-                      dropdownValue = newValue;
-                    });
-                  },
-                  items: itemLista,
-                ),
+                  //BOTON DROPDOWN
+                  DropdownButton<String>(
+                    value: dropdownValue,
+                    icon: Icon(Icons.arrow_downward),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (String newValue) {
+                      print(newValue);
+                      setState(() {
+                        dropdownValue = newValue;
+                      });
+                    },
+                    items: itemLista,
+                  ),
 
-                //SWIPER
+                  //SWIPER
 
-                Swiper(
-                  onIndexChanged: (value) {
-                    //CUENDO SE CAMBIA DE CARTA SE CAMBIA EL VALOR DE LA VARIABLE PARA EL RANKING
-                    idRuta = snapshot.data[value]["id"];
-                  },
-                  layout: SwiperLayout.TINDER,
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (context, index) {
-                    //COMPRUEBA SI HAY UNA IMAGEN VALIDA SI NO LA SUSTITUYE POR UN PLACEHOLDER
-                    var imagen = snapshot.data[index]['imagen'];
-                    var imagenValida;
+                  Swiper(
+                    onIndexChanged: (value) {
+                      //CUENDO SE CAMBIA DE CARTA SE CAMBIA EL VALOR DE LA VARIABLE PARA EL RANKING
+                      idRuta = snapshot.data[value]["id"];
+                    },
+                    layout: SwiperLayout.TINDER,
+                    itemCount: longitudSwiper,
+                    itemBuilder: (context, index) {
+                      //COMPRUEBA SI HAY UNA IMAGEN VALIDA SI NO LA SUSTITUYE POR UN PLACEHOLDER
+                      var imagen = snapshot.data[index]['imagen'];
+                      var imagenValida;
 
-                    if (imagen == "" ||
-                        imagen.substring(imagen.length - 4, imagen.length) ==
-                            ".jpg") {
-                      imagenValida = Image(
-                        image: AssetImage("images/explorer.png"),
-                        height: 200,
-                        width: 300,
-                      );
-                    } else {
-                      //EN LA BASE DE DATOS LAS IMAGENS SE GUARDAR COMO BASE64 ASI SE DECODIFICAN
-                      var imagen64 = base64.decode(imagen);
+                      if (imagen == "" ||
+                          imagen.substring(imagen.length - 4, imagen.length) ==
+                              ".jpg") {
+                        imagenValida = Image(
+                          image: AssetImage("images/explorer.png"),
+                          height: 200,
+                          width: 300,
+                        );
+                      } else {
+                        //EN LA BASE DE DATOS LAS IMAGENS SE GUARDAR COMO BASE64 ASI SE DECODIFICAN
+                        var imagen64 = base64.decode(imagen);
 
-                      imagenValida = Image.memory(
-                        imagen64,
-                        width: 100.0,
-                        height: 200.0,
-                      );
-                    }
+                        imagenValida = Image.memory(
+                          imagen64,
+                          width: 100.0,
+                          height: 200.0,
+                        );
+                      }
 
-                    //SI EL VALOR DEL DROPDOWN COINCIDE CON EL DE LA RUTA SE MUESTRA LA CARTA
-                    if (dropdownValue == snapshot.data[index]["ciudad"]) {
+                      //SI EL VALOR DEL DROPDOWN COINCIDE CON EL DE LA RUTA SE MUESTRA LA CARTA
+                      /*if (dropdownValue == snapshot.data[index]["ciudad"]) {*/
                       return Container(
                         child: Column(children: <Widget>[
                           SizedBox(
@@ -262,151 +273,50 @@ class _SwiperRutasState extends State<SwiperRutas> {
                           borderRadius: BorderRadius.all(Radius.circular(25.0)),
                         ),
                       );
-                    } else if (dropdownValue == "TODOS") {
-                      //MUSTRA TODOS LAS CARTAS DEL SWIPER
-                      return Container(
-                          child: Column(children: <Widget>[
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.blue,
-                                  border: Border.all(
-                                    color: Color.fromRGBO(224, 214, 191, 1),
-                                    width: 4,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: imagenValida,
-                            ),
-                            SizedBox(
-                              height: 30,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                SizedBox(),
-                                Flexible(
-                                    child: Text(snapshot.data[index]['nombre'],
-                                        style: TextStyle(
-                                            fontFamily: 'Arcade',
-                                            fontSize: 16))),
-                                Row(
-                                  children: [Icon(Icons.person), Text("0")],
-                                )
-                              ],
-                            ),
-                            SizedBox(
-                              height: 30,
-                            ),
-                            Container(
-                                width: MediaQuery.of(context).size.width * 0.60,
-                                height:
-                                    MediaQuery.of(context).size.width * 0.40,
-                                child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Flexible(
-                                          child: SingleChildScrollView(
-                                        child: Text(
-                                            snapshot.data[index]['descripcion'],
-                                            style: TextStyle(
-                                                fontFamily: 'Arcade',
-                                                fontSize: 12)),
-                                      )),
-                                      Row(
-                                        children: [
-                                          FlatButton(
-                                            color: Colors.blue[300],
-                                            onPressed: () async {
-                                              puntuacion = 0;
-                                              contRespondido = 0;
-                                              /*****************INICIAR RUTA****************** */
+                    },
+                    itemWidth: MediaQuery.of(context).size.width * 0.80,
+                    itemHeight: MediaQuery.of(context).size.height * 0.80,
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  //BOTON RANKING
+                  FloatingActionButton.extended(
+                    label: Text("RANKING"),
+                    onPressed: () {
+                      /*****************ABRIR RANKING****************** */
 
-                                              Map data = {
-                                                "usuarioId": usuario[0]["id"],
-                                                "rutaId": idRuta,
-                                                "puntuacion": puntuacion,
-                                                "activo": true,
-                                              };
-
-                                              API.createRutaUsuario(data);
-
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => Pages(
-                                                          localizacionesList:
-                                                              snapshot.data[
-                                                                      index][
-                                                                  'listaLocalizaciones'],
-                                                          rutaList: snapshot
-                                                              .data[index],
-                                                        )),
-                                              );
-                                            },
-                                            child: Icon(Icons.check),
-                                          ),
-                                          SizedBox(
-                                            width: 20,
-                                          )
-                                        ],
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                      )
-                                    ]))
-                          ]),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            border: Border.all(width: 3.0),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(25.0)),
-                          ));
-                    }
-                  },
-                  itemWidth: MediaQuery.of(context).size.width * 0.80,
-                  itemHeight: MediaQuery.of(context).size.height * 0.80,
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                //BOTON RANKING
-                FloatingActionButton.extended(
-                  label: Text("RANKING"),
-                  onPressed: () {
-                    /*****************ABRIR RANKING****************** */
-
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Ranking(
-                                  //ID DE LA RUTA ACTUAL
-                                  id: idRuta,
-                                )));
-                  },
-                ),
-              ]);
-            } else if (snapshot.hasError) {
-              //SI HAY UN ERROR CON LA INFORMACION LO QUE MUESTRA
-              return Column(children: [
-                Icon(
-                  Icons.error_outline,
-                  color: Colors.red,
-                  size: 60,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text('Error: ${snapshot.error}'),
-                )
-              ]);
-            } else {
-              //LO QUE MUSTRA MIENTRAS SE CARGA LA INFORMACION
-              return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Center(child: CircularProgressIndicator())]);
-            }
-          }),
-    ));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Ranking(
+                                    //ID DE LA RUTA ACTUAL
+                                    id: idRuta,
+                                  )));
+                    },
+                  ),
+                ]);
+              } else if (snapshot.hasError) {
+                //SI HAY UN ERROR CON LA INFORMACION LO QUE MUESTRA
+                return Column(children: [
+                  Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 60,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Text('Error: ${snapshot.error}'),
+                  )
+                ]);
+              } else {
+                //LO QUE MUSTRA MIENTRAS SE CARGA LA INFORMACION
+                return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [Center(child: CircularProgressIndicator())]);
+              }
+            }),
+      )),
+    );
   }
 }
