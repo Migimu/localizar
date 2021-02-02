@@ -20,11 +20,6 @@ class Pages extends StatefulWidget {
   _PagesState createState() => _PagesState(localizacionesList, rutaList);
 }
 
-@override
-void onBackPressed() {
-  print("object");
-}
-
 class _PagesState extends State<Pages> {
   var localizacionesList = [];
   var rutaList;
@@ -76,9 +71,7 @@ class _PagesState extends State<Pages> {
 //AÑADIR MENSAJE A EL CHAT SI LO RECIVE DEL SERVER
   void escucharServer(json) {
     var data = jsonDecode(json);
-    print('onData: $data');
     setState(() {
-      print("data");
       if (data['from'] == "server") {
         mensajes.add(ChatMessage(
             customProperties: {
@@ -117,7 +110,6 @@ class _PagesState extends State<Pages> {
 //VISTA PAGINADA
   @override
   Widget build(BuildContext context) {
-    print(rutaList);
     return WillPopScope(
       onWillPop: () async => false,
       child: PageView(

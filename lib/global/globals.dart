@@ -47,3 +47,7 @@ int contRespondido = 0;
 //SI EL JUGADOR SIGUE JUGANDO
 
 bool jugando = true;
+
+//LISTA DE RUTAS/USUARIO
+
+List rutasUsuario = [];

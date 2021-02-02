@@ -121,8 +121,6 @@ class _PreguntaState extends State<Pregunta> {
                 //DEVUELVE EL RESUTADO DE LA PREGUNTA SI ES CORRECTO O NO Y VUELVE A MOSTRAR EL MAPA
                 FloatingActionButton.extended(
                     onPressed: () {
-                      //print(pregunta['correcta']);
-                      print("$valor dialog");
                       if (valor == pregunta['correcta']) {
                         print('has acertado');
                       }

@@ -54,6 +54,7 @@ class _MapaState extends State<Mapa> {
     _goToTheUser();
     _distanceFromCircle();
     _updatePosition();
+    _updatePositions();
     //AVATAR SI TIENE UNA IMAGEN VALIDA
 
     if (usuario[0]["avatar"] == "" || usuario[0]["avatar"] == null) {
@@ -116,6 +117,33 @@ class _MapaState extends State<Mapa> {
     Future.delayed(Duration(seconds: 10), _updatePosition);
   }
 
+  //ACTUALIZA LAS POSCIONES DE LOS OTROS USUARIOS
+  Future<void> _updatePositions() async {
+    print(rutasUsuario.length);
+    rutasUsuario
+        .retainWhere((element) => element["id"] == rutaUsuario["rutaId"]);
+    print(rutasUsuario);
+    rutasUsuario.retainWhere((element) => element["activo"] == true);
+    print(rutasUsuario);
+
+    for (var ruta in rutasUsuario) {
+      var usuario = listaUsuarios
+          .firstWhere((element) => ruta["usuario _id"] == element["id"]);
+      print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+          usuario +
+          "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+      setState(() {
+        _markers.add(Marker(
+            markerId: MarkerId("1"),
+            position: LatLng(usuario["lat"], usuario["lng"]),
+            zIndex: 0,
+            visible: true));
+      });
+    }
+
+    Future.delayed(Duration(seconds: 10), _updatePositions);
+  }
+
   //CALCULA LAS DISTANCIAS DESDE LOS PUNTOS MAS CARCANOS
 
   Future<void> _distanceFromCircle() async {
@@ -148,16 +176,13 @@ class _MapaState extends State<Mapa> {
               icon: pinLocationIcon,
               zIndex: 1,
               onTap: () async {
-                print(cont);
                 for (var localizacion in localizaciones) {
                   //var json = jsonDecode(localizacion);
-                  print(circulo.center.latitude == localizacion['latitud']);
+                  /*print(circulo.center.latitude == localizacion['latitud']);
                   print(circulo.center.latitude == localizacion['longitud']);
-                  print(localizacion['latitud']);
+                  print(localizacion['latitud']);*/
                   if (localizacion['latitud'] == circulo.center.latitude ||
                       localizacion['longitud'] == circulo.center.longitude) {
-                    print("object");
-
                     var chatMsg = Map();
 
                     chatMsg["action"] = "msg";
@@ -203,67 +228,70 @@ class _MapaState extends State<Mapa> {
                         context: context,
                         barrierDismissible: false, // user must tap button!
                         builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Row(children: [
-                              Text('Enhorabuena'),
-                              Icon(Icons.celebration)
-                            ]),
-                            content: SingleChildScrollView(
-                              child: ListBody(
-                                children: <Widget>[
-                                  Text('Has finalizado la ruta'),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text('Tu puntuacion ha sido: $puntuacion'),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                      'Si quieres ver tu puesto en el raking selecciona el icono de la derecha si no volveras a la pestaña de rutas'),
-                                ],
+                          return WillPopScope(
+                            onWillPop: () async => false,
+                            child: AlertDialog(
+                              title: Row(children: [
+                                Text('Enhorabuena'),
+                                Icon(Icons.celebration)
+                              ]),
+                              content: SingleChildScrollView(
+                                child: ListBody(
+                                  children: <Widget>[
+                                    Text('Has finalizado la ruta'),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text('Tu puntuacion ha sido: $puntuacion'),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                        'Si quieres ver tu puesto en el raking selecciona el icono de la derecha si no volveras a la pestaña de rutas'),
+                                  ],
+                                ),
                               ),
+                              actions: <Widget>[
+                                //BOTON IZQUIERDA
+                                TextButton(
+                                  child: Icon(Icons.list_alt),
+                                  onPressed: () {
+                                    //VACIA CHAT
+                                    mensajes = [];
+                                    //DEJA DE JUGAR
+                                    jugando = false;
+                                    //ACTUALIZA LA PUTUACION DEL JUGADOR Y MUSTRA EL RANKING
+                                    API.updatePuntuacion(
+                                        rutaUsuario["id"], puntuacion);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => Ranking(
+                                                id: idRuta,
+                                              )),
+                                    );
+                                  },
+                                ),
+                                //BOTON DERECHA
+                                TextButton(
+                                  child: Icon(Icons.clear),
+                                  onPressed: () {
+                                    //VACIA CHAT
+                                    mensajes = [];
+                                    //DEJA DE JUGAR
+                                    jugando = false;
+                                    //ACTUALIZA LA PUTUACION DEL JUGADOR Y MUSTRA LAS RUTAS
+                                    API.updatePuntuacion(
+                                        rutaUsuario["id"], puntuacion);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => SwiperRutas()),
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
-                            actions: <Widget>[
-                              //BOTON IZQUIERDA
-                              TextButton(
-                                child: Icon(Icons.list_alt),
-                                onPressed: () {
-                                  //VACIA CHAT
-                                  mensajes = [];
-                                  //DEJA DE JUGAR
-                                  jugando = false;
-                                  //ACTUALIZA LA PUTUACION DEL JUGADOR Y MUSTRA EL RANKING
-                                  API.updatePuntuacion(
-                                      rutaUsuario["id"], puntuacion);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Ranking(
-                                              id: idRuta,
-                                            )),
-                                  );
-                                },
-                              ),
-                              //BOTON DERECHA
-                              TextButton(
-                                child: Icon(Icons.clear),
-                                onPressed: () {
-                                  //VACIA CHAT
-                                  mensajes = [];
-                                  //DEJA DE JUGAR
-                                  jugando = false;
-                                  //ACTUALIZA LA PUTUACION DEL JUGADOR Y MUSTRA LAS RUTAS
-                                  API.updatePuntuacion(
-                                      rutaUsuario["id"], puntuacion);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => SwiperRutas()),
-                                  );
-                                },
-                              ),
-                            ],
                           );
                         },
                       );
@@ -360,9 +388,6 @@ class _MapaState extends State<Mapa> {
             ),
           ),
 
-          /*PODER DESPLAZAR CON DOS DEDOS*/
-
-          //MultiDragGestureRecognizer(debugOwner: null),
           Container(
             margin: EdgeInsets.only(top: 20, right: 10),
             alignment: Alignment.topRight,

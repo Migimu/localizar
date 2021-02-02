@@ -30,6 +30,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
 
   Future<List> getData() async {
     return await API.getRutas().then((response) {
+      rutasUsuario = response;
       return response;
     });
   }
@@ -38,7 +39,6 @@ class _SwiperRutasState extends State<SwiperRutas> {
 
   Future<Map> getRutausuario(var id) async {
     return await API.getRutaUsuario(id).then((response) {
-      print(response);
       return response;
     });
   }
@@ -83,7 +83,6 @@ class _SwiperRutasState extends State<SwiperRutas> {
                   longitudSwiper = snapshot.data.length;
                 }
 
-                print(snapshot.data);
                 //LISTA DE CIUDADES PARA EL BOTON DROPDOWN
                 idRuta = snapshot.data[0]["id"];
                 rutaName = snapshot.data[0]["nombre"];
@@ -124,7 +123,6 @@ class _SwiperRutasState extends State<SwiperRutas> {
                       color: Colors.deepPurpleAccent,
                     ),
                     onChanged: (String newValue) {
-                      print(newValue);
                       setState(() {
                         dropdownValue = newValue;
                       });
