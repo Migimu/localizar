@@ -79,16 +79,30 @@ class _PagesState extends State<Pages> {
     print('onData: $data');
     setState(() {
       print("data");
-
-      mensajes.add(ChatMessage(
-          buttons: [
-            Text(
-              data['from'],
-              style: TextStyle(color: Colors.blue[900]),
-            )
-          ],
-          text: data['value'],
-          user: ChatUser(name: data['from'], uid: data['from'])));
+      if (data['from'] == "server") {
+        mensajes.add(ChatMessage(
+            customProperties: {
+              "color": Colors.amber
+            },
+            buttons: [
+              Text(
+                "Mensaje del server",
+                style: TextStyle(color: Colors.green[900]),
+              )
+            ],
+            text: data['value'],
+            user: ChatUser(name: data['from'], uid: data['from'])));
+      } else {
+        mensajes.add(ChatMessage(
+            buttons: [
+              Text(
+                data['from'],
+                style: TextStyle(color: Colors.blue[900]),
+              )
+            ],
+            text: data['value'],
+            user: ChatUser(name: data['from'], uid: data['from'])));
+      }
     });
   }
 

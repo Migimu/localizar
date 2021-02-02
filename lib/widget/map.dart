@@ -158,6 +158,16 @@ class _MapaState extends State<Mapa> {
                       localizacion['longitud'] == circulo.center.longitude) {
                     print("object");
 
+                    var chatMsg = Map();
+
+                    chatMsg["action"] = "msg";
+                    chatMsg["from"] = "server";
+                    chatMsg["route"] = rutaName;
+                    chatMsg["value"] =
+                        "El usuario ${usuario[0]["usuario"]} a encontrado la localizacion:${localizacion['nombre']}";
+
+                    socketChat?.write('${jsonEncode(chatMsg)}\n');
+
                     // MUESTRA LA PESTAÑA CON LA PREGUNTA
                     var respuesta = await showDialog(
                         barrierColor: Colors.green,
@@ -169,15 +179,15 @@ class _MapaState extends State<Mapa> {
                         context: context);
 
                     //AÑADE NUEVO MARKER INDICANDO QUE SE HA RESPONDIDIO A LA RESPUESTA
-                    print(_markers.add(Marker(
+                    _markers.add(Marker(
                         markerId: MarkerId("$cont"),
                         position: circulo.center,
                         consumeTapEvents: false,
                         icon: pinAnswered,
                         zIndex: 5,
-                        onTap: () {})));
+                        onTap: () {}));
 
-//BORRA EL PRIMER MARKER
+                    //BORRA EL PRIMER MARKER
                     _markers
                         .retainWhere((element) => element.icon == pinAnswered);
                     if (respuesta) {
