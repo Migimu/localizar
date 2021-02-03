@@ -22,6 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     API.getUsers().then((response) {
       lista = response;
     });
+    super.initState();
   }
 
   /* CONSTANTES */

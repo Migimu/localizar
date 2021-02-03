@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
 import 'package:geo_explorer/api/conexionApi.dart';
 import 'package:geo_explorer/global/globals.dart';
 import 'package:geo_explorer/widget/dialog.dart';
@@ -10,7 +11,6 @@ import 'package:geo_explorer/widget/ranking.dart';
 import 'package:geo_explorer/widget/swiper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-//import 'package:permission_handler/permission_handler.dart';
 
 class Mapa extends StatefulWidget {
   final List localizaciones;
@@ -50,6 +50,7 @@ class _MapaState extends State<Mapa> {
   @override
   void initState() {
     super.initState();
+    /*_getRutasUsuario();*/
     _setCircles();
     _goToTheUser();
     _distanceFromCircle();
@@ -71,6 +72,13 @@ class _MapaState extends State<Mapa> {
       );
     }
   }
+
+  //OBTENER TODAS LA PARTIDAS
+
+  /*Future<List> _getRutasUsuario() async {
+    return 
+  }*/
+
   //OBTENER POSICION ACTUAL
 
   Future<Position> _getCurrentLocation() async {
@@ -119,29 +127,51 @@ class _MapaState extends State<Mapa> {
 
   //ACTUALIZA LAS POSCIONES DE LOS OTROS USUARIOS
   Future<void> _updatePositions() async {
-    print(rutasUsuario.length);
+    await API.getRutasUsuarios().then((response) {
+      rutasUsuario = response;
+    });
+
+    _markers.removeWhere((item) => item.icon == pinLocationIcon);
+
     rutasUsuario
-        .retainWhere((element) => element["id"] == rutaUsuario["rutaId"]);
-    print(rutasUsuario);
+        .retainWhere((element) => element["rutaId"] == rutaUsuario["rutaId"]);
+
     rutasUsuario.retainWhere((element) => element["activo"] == true);
-    print(rutasUsuario);
+
+    var cont = 0;
 
     for (var ruta in rutasUsuario) {
-      var usuario = listaUsuarios
-          .firstWhere((element) => ruta["usuario _id"] == element["id"]);
-      print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
-          usuario +
-          "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+      var userAhora = listaUsuarios.firstWhere((element) {
+        return ruta["usuarioId"] == element["id"];
+      });
+      var pinUser;
+
+      if (userAhora["avatar"] == null || userAhora["avatar"] == "") {
+        pinUser = await BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(devicePixelRatio: 100),
+            'images/usuarioMarker.png');
+      } else {
+        pinUser = await BitmapDescriptor.fromAssetImage(
+            ImageConfiguration(
+              devicePixelRatio: 100,
+            ),
+            'images/usuarioMarker.png');
+      }
+
       setState(() {
         _markers.add(Marker(
-            markerId: MarkerId("1"),
-            position: LatLng(usuario["lat"], usuario["lng"]),
+            markerId: MarkerId("User$cont"),
+            position: LatLng(ruta["lat"], ruta["lng"]),
+            consumeTapEvents: false,
             zIndex: 0,
-            visible: true));
+            visible: true,
+            icon: pinUser));
       });
+      cont++;
     }
-
-    Future.delayed(Duration(seconds: 10), _updatePositions);
+    if (jugando) {
+      Future.delayed(Duration(seconds: 10), _updatePositions);
+    }
   }
 
   //CALCULA LAS DISTANCIAS DESDE LOS PUNTOS MAS CARCANOS
@@ -159,10 +189,12 @@ class _MapaState extends State<Mapa> {
           circulo.center.longitude);
 
       pinLocationIcon = await BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(devicePixelRatio: 5), 'images/pregunta.png');
+          ImageConfiguration(devicePixelRatio: 50, size: Size(50, 50)),
+          'images/pregunta.png');
 
       pinAnswered = await BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(devicePixelRatio: 5), 'images/comprobar.png');
+          ImageConfiguration(devicePixelRatio: 50, size: Size(50, 50)),
+          'images/comprobar.png');
 
       if (distancia < 50) {
         setState(() {
@@ -170,17 +202,13 @@ class _MapaState extends State<Mapa> {
           //SI ESTA DENTRO DEL CICULO SE MUSTRA EL ICONO
 
           _markers.add(Marker(
-              markerId: MarkerId("$cont"),
+              markerId: MarkerId("Ori$cont"),
               position: circulo.center,
               consumeTapEvents: false,
               icon: pinLocationIcon,
               zIndex: 1,
               onTap: () async {
                 for (var localizacion in localizaciones) {
-                  //var json = jsonDecode(localizacion);
-                  /*print(circulo.center.latitude == localizacion['latitud']);
-                  print(circulo.center.latitude == localizacion['longitud']);
-                  print(localizacion['latitud']);*/
                   if (localizacion['latitud'] == circulo.center.latitude ||
                       localizacion['longitud'] == circulo.center.longitude) {
                     var chatMsg = Map();
@@ -205,7 +233,7 @@ class _MapaState extends State<Mapa> {
 
                     //AÑADE NUEVO MARKER INDICANDO QUE SE HA RESPONDIDIO A LA RESPUESTA
                     _markers.add(Marker(
-                        markerId: MarkerId("$cont"),
+                        markerId: MarkerId("Bien$cont"),
                         position: circulo.center,
                         consumeTapEvents: false,
                         icon: pinAnswered,
@@ -213,8 +241,9 @@ class _MapaState extends State<Mapa> {
                         onTap: () {}));
 
                     //BORRA EL PRIMER MARKER
-                    _markers
-                        .retainWhere((element) => element.icon == pinAnswered);
+                    _markers.retainWhere((element) =>
+                        element.markerId.value.contains("Bien") ||
+                        element.markerId.value.contains("User"));
                     if (respuesta) {
                       puntuacion = puntuacion + 10;
                     }
@@ -263,6 +292,7 @@ class _MapaState extends State<Mapa> {
                                     //ACTUALIZA LA PUTUACION DEL JUGADOR Y MUSTRA EL RANKING
                                     API.updatePuntuacion(
                                         rutaUsuario["id"], puntuacion);
+                                    print(idRuta);
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -308,8 +338,9 @@ class _MapaState extends State<Mapa> {
         //SI TE ALEJAS DEL CICULO SE OCULTA EL ICONO A NO SER QUE SE HALLA RESPONDIDIO
         setState(() {
           _isVisible = false;
-          _markers.retainWhere((element) => element.icon == pinAnswered);
-          _markers.removeWhere((item) => item.icon == pinLocationIcon);
+          _markers.retainWhere((element) =>
+              element.markerId.value.contains("Bien") ||
+              element.markerId.value.contains("User"));
         });
       }
     }
@@ -341,7 +372,7 @@ class _MapaState extends State<Mapa> {
             center: LatLng(localizacion["latitud"], localizacion["longitud"]),
             radius: 50,
             zIndex: 0,
-            visible: true));
+            visible: false));
         _puntos.add(LatLng(localizacion["latitud"], localizacion["longitud"]));
       });
       cont++;

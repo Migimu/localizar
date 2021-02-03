@@ -24,12 +24,15 @@ class _PagesState extends State<Pages> {
   var localizacionesList = [];
   var rutaList;
 
+  //LOCAL IP CLASE
   //String localIP = "10.10.12.183";
-  //String localIP = "13.95.106.247";
-  String localIP = "192.168.56.1";
+  //AZURE IP
+  String localIP = "13.95.106.247";
+  //LOCAL IP CASA
+  //String localCasaIP = "192.168.56.1";
 
-  int port = 1234;
-  //int port = 443;
+  //int port = 1234;
+  int port = 443;
 
   String nick = usuario[0]["nombre"];
 
@@ -113,6 +116,14 @@ class _PagesState extends State<Pages> {
     return WillPopScope(
       onWillPop: () async => false,
       child: PageView(
+        pageSnapping: true,
+        onPageChanged: (value) {
+          if (value != 1) {
+            jugando = false;
+          } else {
+            jugando = true;
+          }
+        },
         children: <Widget>[
           //PAGINA INFORMACION
           InfoPage(

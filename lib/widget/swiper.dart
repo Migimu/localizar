@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:geo_explorer/global/globals.dart';
-import 'package:geo_explorer/models/ruta.dart';
+
 import 'package:geo_explorer/pages/pageView.dart';
 import 'package:geo_explorer/api/conexionApi.dart';
 import 'package:geo_explorer/widget/ranking.dart';
-import 'package:provider/provider.dart';
 
 class SwiperRutas extends StatefulWidget {
   SwiperRutas({Key key}) : super(key: key);
@@ -30,7 +29,6 @@ class _SwiperRutasState extends State<SwiperRutas> {
 
   Future<List> getData() async {
     return await API.getRutas().then((response) {
-      rutasUsuario = response;
       return response;
     });
   }
@@ -61,10 +59,6 @@ class _SwiperRutasState extends State<SwiperRutas> {
   var dropdownValue = "TODOS";
   @override
   Widget build(BuildContext context) {
-    final ruta = Provider.of<Ruta>(context);
-
-    final rutas = Provider.of<Rutas>(context);
-
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
@@ -136,6 +130,7 @@ class _SwiperRutasState extends State<SwiperRutas> {
                     onIndexChanged: (value) {
                       //CUENDO SE CAMBIA DE CARTA SE CAMBIA EL VALOR DE LA VARIABLE PARA EL RANKING
                       idRuta = snapshot.data[value]["id"];
+                      rutaName = snapshot.data[value]["nombre"];
                     },
                     layout: SwiperLayout.TINDER,
                     itemCount: longitudSwiper,

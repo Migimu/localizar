@@ -3,8 +3,15 @@ import 'package:geo_explorer/global/globals.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+//LOCAL IP CLASE
+//String localIP = "10.10.12.183";
+//AZURE IP
+const String localIP = "13.95.106.247";
+//LOCAL IP CASA
+//String localCasaIP = "192.168.56.1";
+
 const baseUrl =
-    "http://10.0.2.2:8080"; //10.0.2.2 porque estas en un emulador de android
+    "http://13.95.106.247:8080/apiMongo"; //10.0.2.2 porque estas en un emulador de android
 
 //LLAMDA A API PARA CONSEGUIR LAS RUTAS
 
@@ -127,5 +134,16 @@ class API {
     var url = baseUrl + "/rutaUsuario/editRutaPosicion/$id/$lat/$lng";
 
     await http.put(url);
+  }
+
+  static Future getRutasUsuarios() async {
+    var url = baseUrl + "/rutaUsuario/getAll";
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      var responseJson = json.decode(response.body);
+      return responseJson;
+    } else {
+      return null;
+    }
   }
 }
